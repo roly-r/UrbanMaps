@@ -1,0 +1,55 @@
+{% include 'header.html' %}
+<br><br>
+
+    <div class="container mt-4">
+        <h1>Pagos Mensuales</h1>
+        <a href="{{ url_for('pagos.create_pago') }}" class="btn btn-outline-light">Registrar Nuevo Pago</a>
+        <!-- GENERAMOS PDF -->
+        <br><br>
+        <a href="{{ url_for('pagos.generar_reporte_pdf') }}" class="btn btn-outline-success">Generar Reporte de Todos los Pagos (PDF)</a>
+        <br>
+        <!-- Búsqueda -->
+        <form action="{{ url_for('pagos.buscar') }}" method="POST" class="mb-4">
+            <br>
+            <div class="row g-2 align-items-center">
+                <div class="search-container">
+                    
+                    <input type="text" name="termino" id="termino" class="form-control" 
+                           value="{{ termino | default('') }}" placeholder="Ingrese CI:" required>
+
+                    <button type="submit" class="btn btn-outline-info">Buscar</button>
+                </div>
+            </div>
+        </form>
+        <table class="table-gris">
+            <thead>
+                <tr>
+                    <th>CI</th>
+                    <th>Monto</th>
+                    <th>Mes</th> 
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pago in pagos %}
+                <tr>
+                    <td>{{ pago.ci }}</td>
+                    <td>{{ pago.monto }}</td>
+                    <td>{{ pago.mes }}</td>
+                    <td>{{ pago.estado }}</td>
+                    <td>{{ pago.fecha }}</td>
+                    <td>{{ pago.descripcion }}</td>
+                    <td>
+                        <a href="{{ url_for('pagos.edit_pago', cod_pm=pago['cod_pm']) }}" class="btn btn-outline-info">Editar</a>
+                        <a href="{{ url_for('pagos.delete_pago', cod_pm=pago['cod_pm']) }}" class="btn btn-outline-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este pago?');">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% include 'footer.html' %}

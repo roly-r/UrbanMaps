@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutas PumaKatari - La Paz</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+    #map {
+      width: 100%;
+      height: 90vh;
+    }
+    .info {
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: left; /* Alinea el texto a la izquierda */
+      font-size: 24px; /* Reduce el tamaño de la fuente */
+      font-weight: normal; /* Cambia el grosor de la fuente si deseas menos prominencia */
+      margin: 10px 0; /* Ajusta el margen para una mejor posición */
+      color: #333; /* Mantén el color */
+      background-color: #f7f7f7; /* Fondo, opcional */
+      padding: 5px; /* Reduce el padding */
+      border-radius: 5px; /* Ajusta el borde redondeado */
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Disminuye la sombra */
+      text-shadow: none; /* Opcional: elimina el efecto de sombra en el texto */
+    }
+    
+    select {
+      display: inline-block; /* Cambia de block a inline-block */
+      margin: 10px 0; /* Ajusta el margen para eliminar la centralización */
+      padding: 5px; /* Reduce el tamaño del padding */
+      font-size: 14px; /* Reduce el tamaño de la fuente */
+      width: auto; /* Asegúrate de que el ancho no sea demasiado grande */
+      text-align: left; /* Opcional: alinea el texto dentro del select */
+    }
+    
+
+    #map {
+      height: 100vh;
+      width: 100vw;
+    }
+    #info-box {
+      text-align: center;
+      margin-top: 20px;
+    }
+    #route-description {
+      margin-top: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    </style>
+    </head>
+    <body>
+    <h1>Rutas Centricas  - La Paz (bus pumakatari)</h1>
+    <button id="locateButton">Mostrar mi ubicación</button>
+    <br>
+
+    <select id="select-location">
+    <option value="">selecione una ruta</option>
+    <option value="-16.53806, -68.08730">Estacion Teleferico Verde Irpavi</option>
+    <option value="-16.54023, -68.05417">Parada Chasquipampa / Calle 37 cota cota</option>
+    <option value="-16.48445, -68.12190">Museo de la revolucion(linea naranja - plaza Villarroel)</option>
+    <option value="-16.49947, -68.12179">Estadion Hernando Siles (av. German Busch )</option>
+    <option value="-16.49431, -68.12132">Estadion Monumento German Busch - Teleferico Cafe MunumentO busch </option>
+    <option value="-16.51946, -68.11620">parada pumakatari - linea celeste curva de Holgi - linea (amarilla -verde) </option>
+    <option value="-16.50066, -68.13236">estacion linea celeste - parada pumakatari plaza camacho</option>
+    <option value="-16.50021, -68.13550">estacion linea Morada </option>
+    <option value="-16.536022,-68.095752">Campo Ferial Chuquiago Marka</option>
+    <option value="-16.541489,-68.064673">Laguna Cota Cota</option>
+    <option value="-16.50419,-68.12602">Estacion teatro al aire libre</option>
+    </select>
+    <div id = "info-box">
+    <div id = "router-description" ></div>
+    </div>
+    <div id="map" style="height: 800px;"></div>
+
+
+    <div id="map"></div>
+    <!--SCRIPT-->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // Inicializar el mapa
+    const map = L.map('map').setView([-16.5105, -68.1625], 13); // Coordenadas de El Alto
+
+    // Capa base (OpenStreetMap)
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Capa base adicional (Satélite)
+    const satellite = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png');
+
+
+// Capa superpuesta: Clima en tiempo real (nubes ficticias para ejemplo)
+const clouds = L.tileLayer('https://tile.openweathermap.org/map/clouds/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: 'Map data © OpenStreetMap contributors'
+});
+
+// Capa superpuesta: Zonas verdes (parques y áreas naturales ficticias para ejemplo)
+const greenAreas = L.tileLayer('https://maps.heigit.org/openmapsurfer/tiles/green/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: 'Map data © OpenStreetMap contributors'
+});
+
+// Capa superpuesta: Tráfico en tiempo real (ficticia para ejemplo sin API)
+const traffic = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: 'Map data © OpenStreetMap contributors'
+});
+
+// Capa superpuesta: Transporte público (ficticia para ejemplo sin API)
+const transport = L.tileLayer('https://tile.thunderforest.com/transport/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: 'Map data © OpenStreetMap contributors'
+});
+
+
+    // Definir las capas base
+    const baseMaps = {
+    "Callejero": osm,
+    "Satélite": satellite
+  
+    };
+    // Agregar control de capas al mapa
+    L.control.layers(baseMaps).addTo(map);
+
+    // Información de rutas
+    const routes = {
+      '-16.53806, -68.08730': {
+        image: 'static/img/irpavi.jpg',
+        description: 'La estación Teleférico Verde Irpavi es parte de la línea verde del sistema Puma Katari.'
+      },
+      '-16.54023, -68.05417': {
+        image: 'static/img/chasquipampa.jpg',
+        description: 'Parada Chasquipampa / Calle 37 cota cota, ubicada en la zona sur de La Paz.'
+      },
+      '-16.48445, -68.12190': {
+        image: 'static/img/revolucion.jpg',
+        description: 'El Museo de la revolución, ubicado en la plaza Villarroel, es parte de la línea naranja del sistema.'
+      },
+      '-16.49947, -68.12179': {
+        image: 'static/img/Hernando_Siles.jpg',
+        description: 'Estadio Hernando Siles, ubicado en la avenida German Busch.'
+      },
+      '-16.49431, -68.12132': {
+        image: 'static/img/German_Busch.jpg',
+        description: 'Monumento German Busch - Teleférico Cafe MonumentO Busch.'
+      },
+      '-16.51946, -68.11620': {
+        image: 'static/img/curva.jpg',
+        description: 'Parada Pumakatari en la línea celeste, curva de Holgi.'
+      },
+      '-16.541489,-68.064673':{
+        image: 'static/img/laguna1.jpg',
+        description: 'laguna cota cota , espacio natural muy visitado en La Paz.'
+      },
+      '-16.536022,-68.095752':{
+        image : 'static/img/campo_ferial.jpg',
+        description: 'Campo Ferial Chuquiago Marka, Un importantente espacio de eventos ene La Paz '
+
+      },
+      '-16.50419,-68.12602':{
+        image : 'static/img/teatro_libre.jpg',
+        description: 'Estacion de Teatro al Aire libre, ubicada en la zona Sur de La Paz.'
+
+      },
+      '-16.50066, -68.13236': {
+        image: 'static/img/camacho.jpg',
+        description: 'Estación de la línea celeste, parada Pumakatari, plaza Camacho.'
+      },
+      '-16.50021, -68.13550': {
+        image: 'static/img/morado.jpg',
+        description: 'Estación de la línea morada.'
+      }
+    };
+
+
+
+    // Contenedor para las capas de rutas
+    const rutasLayers = {
+      
+    };
+
+    // rutas centricas
+    const rutasData = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido A", "descripcion": " PumaKatari parada San pedro - Achumani- (Chasquipampa) - Calle 16 Obrajes - parada campo ferial - parada calle 2" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+
+              [-68.095752,-16.536022],// campo ferial chuqiago marca
+              [-68.098041,-16.53296],
+              [-68.100725, -16.53018],
+              [-68.103548,-16.528825],
+              [-68.108361,-16.52639],
+              [-68.112813,-16.523687],
+              [-68.11281 , -16.52372],
+              [-68.113597, -16.52319],
+              [-68.11474, -16.522424],
+              [-68.11494, -16.521581],
+              [-68.11484, -16.520608],
+              [-68.11467,-16.519930],
+              [-68.11490, -16.51989],
+              [-68.11536, -16.52034],
+              [-68.11580, -16.52077],
+              [-68.11619, -16.52067],//parada chasquipampa curva del holguin
+              [-68.11628, -16.52000],
+              [-68.11626, -16.51961]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido B", "descripcion": "Parada del Puma Katari Ingreso Irpavi Teleferico verde(laguna cota cota ) - chasquipampa - Parada C37 " },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.0869, -16.5383],
+              [-68.0862,-16.5400],
+              [-68.0823,-16.53870],
+              [-68.0780,-16.53884],
+              [-68.0757,-16.53903],
+              [-68.0744,-16.54003],
+              [-68.0728,-16.53949],
+              [-68.0689,-16.54043],
+              [-68.0661,-16.54062],
+              [-68.0619, -16.54126],
+              [-68.0596,-16.54104],
+              [-68.0593, -16.54098],
+              [-68.0584,-16.541087],
+              [-68.0583, -16.54118],
+              [-68.0576,-16.54162],
+              [-68.0574,-16.54149],
+              [-68.05747,-16.54115],
+              [-68.05755,-16.5398],
+              [-68.05727,-16.53983],
+              [-68.05713,-16.54037],
+              [-68.05689, -16.54076],
+              [-68.05614,-16.54109],
+              [-68.05605, -16.540687],
+              [-68.05623,-16.54024],
+              [-68.05627, -16.53981],
+              [-68.05611, -16.53963],
+              [-68.05584,-16.53981],
+              [-68.05560, -16.54012],
+              [-68.05540, -16.54025],
+              [-68.0550, -16.540309],
+              [-68.05483, -16.54023],
+              [-68.05440,-16.540132],
+              [-68.05404,-16.5401343]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido C", "descripcion": "Parada PumaKatari - Villa Lobos - Villa Salomé - Monumento german Busch - Parada Pumakatari" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.12281, -16.50230],
+              [-68.12089, -16.5026],
+              [-68.12132, -16.49450],
+              [-68.11932, -16.49729],
+              [-68.11861, -16.49688],
+              [-68.11856, -16.49689],
+              [-68.11844, -16.49624],
+              [ -68.11817, -16.4959],
+             [-68.118076, -16.4956],
+             [-68.118485, -16.49488],
+             [-68.117886, -16.49416],
+             [-68.116705, -16.493479],
+             [-68.115586, -16.492726],
+             [-68.115959, -16.493027],
+             [-68.115200, -16.49248],
+             [-68.114959, -16.492853]
+            ]
+          }
+        },
+
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido D", "descripcion": " Parada Puerto Rico PumaKatari Integradora - Plaza Villarroel - barrio grafico" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.1217, -16.487146],
+              [-68.12170, -16.48507],
+              [-68.12109, -16.48504],
+              [-68.12105, -16.484655],
+              [-68.12109, -16.483873],
+              [-68.120687, -16.48351],
+              [ -68.1204 ,-16.48287,],
+              [ -68.1199,-16.48201],
+              [-68.11982, -16.48158],
+              [-68.1197, -16.480800],
+              [-68.11934, -16.480767],
+              [-68.119146, -16.480653]
+
+            
+
+              
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido E", "descripcion": " Parada PumaKatari irpavi 2, Plaza Camacho -Chasquipampa -calle Nicolas Acosta "},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [ -68.13019,-16.500752],//<!--parada 1 plaza camacho -->
+              [-68.130570, -16.50066355],
+              [-68.131841, -16.50009],
+              [ -68.13199, -16.500241], //parada chasquipampa
+              [-68.13218 , -16.50067],//<!--telefericoceleste-->
+              [ -68.132848, -16.50121],
+              [-68.13317, -16.500815],
+              [-68.13391, -16.50024],
+              [-68.13520, -16.49895],
+              [-68.13618, -16.49957],
+              [-68.13551, -16.50023],
+              [-68.13537, -16.50037],
+              [-68.13501,-16.50071],
+              [-68.134460, -16.50109],
+              [-68.133852, -16.50170],
+              [-68.134251, -16.50212] //parada nicolas acosta
+              
+              
+            ]
+          }
+        }
+
+        
+      ]
+    };
+    // colores para cada ruta
+    const routeColors = {
+    "Recorrido A": "blue",
+    "Recorrido B": "red",
+    "Recorrido C": "cyan", 
+    "Recorrido D": "purple",
+    "Recorrido E": "brown" 
+    };
+
+    // Crear capas de rutas
+    rutasData.features.forEach((feature) => {
+    const color = routeColors[feature.properties.name] || "gray"; // Default color si no está definido
+    const layer = L.geoJSON(feature, {
+    style: {
+      color: color,
+      weight: 4
+      }
+      }).bindPopup(`
+     <strong>${feature.properties.name}</strong><br>
+    ${feature.properties.descripcion}
+    `);
+    rutasLayers[feature.properties.name] = layer;
+    });
+    // Control de capas
+    L.control.layers(null, rutasLayers).addTo(map);
+
+    // Añadir todas las rutas al mapa por defecto
+    Object.values(rutasLayers).forEach(layer => layer.addTo(map));
+
+    // Evento al seleccionar una ruta
+    document.getElementById('select-location').addEventListener('change', function(e) {
+      let coords = e.target.value.split(",");
+      if (coords[0] !== "") {
+        map.flyTo(coords, 15);
+
+        // Crear el marcador y contenido del popup
+        let marker = L.marker(coords).addTo(map);
+        let info = routes[e.target.value];
+        let popupContent = `
+          <div style="text-align: center;">
+            <img src="${info.image}" alt="${info.description}" style="max-width: 100%;"/>
+            <p>${info.description}</p>
+          </div>
+        `;
+        marker.bindPopup(popupContent).openPopup();
+
+        // Mostrar la descripción correspondiente
+        document.getElementById('route-description').innerHTML = info.description;
+      }
+    });
+
+    // Añadir funcionalidad de clic para agregar marcadores
+    map.on('click', (e) => {
+      const { lat, lng } = e.latlng;
+      const marker = L.marker([lat, lng]).addTo(map);
+      marker.bindPopup(`<strong>Punto marcado:</strong><br>Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`).openPopup();
+    });
+
+    // Control para mostrar información adicional
+    const info = L.control();
+    info.onAdd = function () {
+      this._div = L.DomUtil.create('div', 'info');
+      this.update();
+      return this._div;
+    };
+    info.update = function (props) {
+      this._div.innerHTML = props
+        ? `<h4>Información</h4><b>${props.name}</b><br>${props.descripcion}`
+        : `<h4>Haz clic en una ruta para más detalles</h4>`;
+    };
+    info.addTo(map);
+
+      // Actualizar información al pasar el mouse sobre una ruta
+      Object.values(rutasLayers).forEach(layer => {
+        layer.on('mouseover', (e) => info.update(e.layer.feature.properties));
+        layer.on('mouseout', () => info.update());
+     });
+
+    ///ubicacion actual
+
+    document.getElementById('locateButton').addEventListener('click', function() {
+    map.locate({ setView: true, maxZoom: 18 });
+    });
+
+
+    map.locate({ setView: true, maxZoom: 18 });
+    map.on('locationfound', function (e) {
+    L.marker(e.latlng).addTo(map)
+    .bindPopup("Estás aquí").openPopup();
+    });
+
+    ///icono de bus
+    // Lista de coordenadas para los puntos
+    const busStopsRoute1 = [
+    [-16.536022, -68.095752],// campo ferial chuqiago marca
+    [-16.53296 ,-68.098041,],
+    [ -16.53018 , -68.100725],
+    [-16.528825, -68.103548],
+    [-16.52639, -68.108361],
+    [-16.523687, -68.112813],
+    [ -16.52372, -68.11281 ],
+    [ -16.52319, -68.113597],
+    [ -16.522424, -68.11474],
+    [-16.521581, -68.11494],
+    [ -16.520608 ,-68.11484],
+    [-16.519930 , -68.11467],
+    [ -16.51989, -68.11490],
+    [ -16.52034, -68.11536],
+    [ -16.52077, -68.11580],
+    [ -16.52067, -68.11619],//parada chasquipampa curva del holguin
+    [ -16.52000, -68.11628],
+    [ -16.51961 , -68.11626]
+    ];
+    // Crear ícono personalizado para los puntos
+    const busIconRoute1 = L.icon({
+    iconUrl: 'static/img/bus_negro.png', // Ruta de la imagen
+    iconSize: [32, 32] // Tamaño del ícono (ajusta según necesites)
+     });
+  
+
+    // Agregar los marcadores al mapa con la imagen personalizada
+    busStopsRoute1.forEach(location => {
+    L.marker(location, { icon: busIconRoute1 }).addTo(map);
+    });
+
+    ///ruta B
+    const busStopsRoute2 = [
+    [-16.5383, -68.0869],
+    [-16.5400, -68.0862],
+    [-16.53870, -68.0823],
+    [-16.53884, -68.0780],
+    [-16.53903, -68.0757],
+    [-16.54003, -68.0744],
+    [-16.53949, -68.0728],
+    [-16.54043, -68.0689],
+    [-16.54062, -68.0661],
+    [-16.54126, -68.0619],
+    [-16.54104, -68.0596],
+    [-16.54098, -68.0593],
+    [-16.541087, -68.0584],
+    [-16.54118, -68.0583],
+    [-16.54162, -68.0576],
+    [-16.54149, -68.0574],
+    [-16.54115, -68.05747],
+    [-16.5398, -68.05755],
+    [-16.53983, -68.05727],
+    [-16.54037, -68.05713],
+    [-16.54076, -68.05689],
+    [-16.54109, -68.05614],
+    [-16.540687, -68.05605],
+    [-16.54024, -68.05623],
+    [-16.53981, -68.05627],
+    [-16.53963, -68.05611],
+    [-16.53981, -68.05584],
+    [-16.54012, -68.05560],
+    [-16.54025, -68.05540],
+    [-16.540309, -68.0550],
+    [-16.54023, -68.05483],
+    [-16.540132, -68.05440],
+    [-16.5401343, -68.05404]
+
+    ];
+
+    const busIconRoute2 = L.icon({
+    iconUrl: 'static/img/bus_negro.png',
+    iconSize: [32, 32]
+    });
+
+    busStopsRoute2.forEach(location => {
+    L.marker(location, { icon: busIconRoute2 }).addTo(map);
+    });
+    //ruta C
+    const busStopsRoute3 = [
+    [-16.50230, -68.12281],
+    [-16.5026, -68.12089],
+    [-16.49450, -68.12132],
+    [-16.49729, -68.11932],
+    [-16.49688, -68.11861],
+    [-16.49689, -68.11856],
+    [-16.49624, -68.11844],
+    [-16.4959, -68.11817],
+    [-16.4956, -68.118076],
+    [-16.49488, -68.118485],
+    [-16.49416, -68.117886],
+    [-16.493479, -68.116705],
+    [-16.492726, -68.115586],
+    [-16.493027, -68.115959],
+    [-16.49248, -68.115200],
+    [-16.492853, -68.114959]
+    ];
+    const busIconRoute3 = L.icon({
+    iconUrl: 'static/img/bus_negro.png',
+    iconSize: [32, 32]
+    });
+
+    busStopsRoute3.forEach(location => {
+    L.marker(location, { icon: busIconRoute3 }).addTo(map);
+    });
+      ///ruta D
+      const busStopsRoute4 = [
+      [-16.487146, -68.1217],
+      [-16.48507, -68.12170],
+      [-16.48504, -68.12109],
+      [-16.484655, -68.12105],
+      [-16.483873, -68.12109],
+      [-16.48351, -68.120687],
+      [-16.48287, -68.1204],
+      [-16.48201, -68.1199],
+      [-16.48158, -68.11982],
+      [-16.480800, -68.1197],
+      [-16.480767, -68.11934],
+      [-16.480653, -68.119146]
+
+    ];
+
+    const busIconRoute4 = L.icon({
+    iconUrl: 'static/img/bus_negro.png',
+    iconSize: [32, 32]
+    });
+
+    busStopsRoute4.forEach(location => {
+    L.marker(location, { icon: busIconRoute4 }).addTo(map);
+    });
+    //Ruta E
+    const busStopsRoute5 = [
+    [-16.500752, -68.13019], //<!--parada 1 plaza camacho
+    [-16.50066355, -68.130570],
+    [-16.50009, -68.131841],
+    [-16.500241, -68.13199], //parada chasquipampa
+    [-16.50067, -68.13218], //<!--telefericoceleste
+    [-16.50121, -68.132848],
+    [-16.500815, -68.13317],
+    [-16.50024, -68.13391],
+    [-16.49895, -68.13520],
+    [-16.49957, -68.13618],
+    [-16.50023, -68.13551],
+    [-16.50037, -68.13537],
+    [-16.50071, -68.13501],
+    [-16.50109, -68.134460],
+    [-16.50170, -68.133852],
+    [-16.50212, -68.134251] //parada nicolas acosta
+
+
+   ];
+
+    const busIconRoute5 = L.icon({
+    iconUrl: 'static/img/bus_negro.png',
+    iconSize: [32, 32]
+   });
+
+    busStopsRoute5.forEach(location => {
+    L.marker(location, { icon: busIconRoute5 }).addTo(map);
+   });
+
+    // Hacer zoom cuando se selecciona una capa
+    map.on('layeradd', function(event) {
+      if (event.layer instanceof L.GeoJSON) {
+        map.fitBounds(event.layer.getBounds()); // Zoom a la capa seleccionada
+      }
+    });
+  </script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutas - La Paz</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        #map {
+            width: 100%;
+            height: 90vh;
+        }
+
+        .info {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head> 
+
+<body>
+    <h1>Rutas - La Paz</h1>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicializar el mapa
+        const map = L.map('map').setView([-16.51612, -68.11386], 13); // Coordenadas de El Alto
+
+        // Capa base (OpenStreetMap)
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Contenedor para las capas de rutas y polígonos
+        const rutasLayers = {};
+        const poligonosLayers = {};
+        const puntosLayers = {};
+
+
+        // Datos GeoJSON de rutas de minibuses (puedes reemplazarlo por tus datos reales)
+        const rutasData = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta N° 1 <br>En el centro de la ciudad con lugares atractivos y diversos mostrando la riqueza cultural.", "descripcion": "En el centro de la ciudad con lugares atractivos y diversos mostrando la riqueza cultural." },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.13389, -16.50844],
+                        [-68.13517, -16.50718],
+                        [-68.13275, -16.50681],
+                        [-68.13243, -16.50616],
+                        [-68.12672, -16.51138],
+                        [-68.12909, -16.51339],
+                        [-68.12899, -16.51395],
+                        [-68.12990, -16.51413],
+                        [-68.13002, -16.51477],
+                        [-68.11594, -16.51914],
+                        [-68.11072, -16.52143],
+                        [-68.10779, -16.52300],
+                        [-68.10069, -16.52689],
+                        [-68.10118, -16.52803],
+                        [-68.10056, -16.52875],
+                        [-68.10002, -16.52911],
+                        [-68.10005, -16.52923],
+                        [-68.09975, -16.52907],
+                        [-68.09916, -16.52962],
+                        [-68.09877, -16.52964],
+                        [-68.09844, -16.52962],
+                        [-68.09842, -16.53020],
+                        [-68.09800, -16.53043],
+                        [-68.09776, -16.53058],
+                        [-68.09766, -16.53090],
+                        [-68.09720, -16.53149],
+                        [-68.09615, -16.53156]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta N° 2 <br> Podemos encontrar lugares que nos muestran la belleza de la ciudad y sus tradiciones.", "descripcion": "Podemos encontrar lugares que nos muestran la belleza de la ciudad y sus tradiciones." },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.12769, -16.49487],
+                        [-68.12763, -16.49460],
+                        [-68.12890, -16.49484],
+                        [-68.13068, -16.49424],
+                        [-68.13122, -16.49479],
+                        [-68.13551, -16.49181],
+                        [-68.13616, -16.49284],
+                        [-68.13461, -16.49362],
+                        [-68.13245, -16.49493],
+                        [-68.13298, -16.49564],
+                        [-68.13340, -16.49623],
+                        [-68.13398, -16.49580],
+                        [-68.13486, -16.49544],
+                        [-68.13620, -16.49736],
+                        [-68.13667, -16.49637],
+                        [-68.13774, -16.49687],
+                        [-68.13838, -16.49739],
+                        [-68.13893, -16.49608]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta N° 3 <br> Encontramos una ruta que nos muestera la belleza de la ciudad dandonos algunos desafios debido a sus estructura.", "descripcion": "Encontramos una ruta que nos muestera la belleza de la ciudad dandonos algunos desafios debido a sus estructura." },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.02451, -16.54199],
+                        [-68.02464, -16.54281],
+                        [-68.02704, -16.54128],
+                        [-68.02747, -16.54165],
+                        [-68.02893, -16.54115],
+                        [-68.02850, -16.54177],
+                        [-68.02902, -16.54325],
+                        [-68.02966, -16.54194],
+                        [-68.03065, -16.54181],
+                        [-68.03095, -16.54100],
+                        [-68.03106, -16.54008],
+                        [-68.03260, -16.54010],
+                        [-68.03305, -16.53944],
+                        [-68.03550, -16.53839],
+                        [-68.04075, -16.53514],
+                        [-68.04284, -16.53568],
+                        [-68.04352, -16.53751],
+                        [-68.04434, -16.53961],
+                        [-68.04651, -16.54045],
+                        [-68.04766, -16.54119],
+                        [-68.04947, -16.54136],
+                        [-68.05148, -16.54290],
+                        [-68.05272, -16.54398],
+                        [-68.05475, -16.54486],
+                        [-68.05613, -16.54461],
+                        [-68.05816, -16.54570],
+                        [-68.06131, -16.54724],
+                        [-68.06743, -16.54524],
+                        [-68.07305, -16.54718],
+                        [-68.08225, -16.54555],
+                        [-68.08427, -16.54590],
+                        [-68.08685, -16.54530],
+                        [-68.09230, -16.54559],
+                        [-68.09280, -16.54525],
+                        [-68.09138, -16.55121],
+                        [-68.09386, -16.55615],
+                        [-68.09400, -16.55934],
+                        [-68.09472, -16.56008],
+                        [-68.09806, -16.56005],
+                        [-68.09828, -16.56043],
+                        [-68.09631, -16.56140],
+                        [-68.09631, -16.56220],
+                        [-68.09462, -16.56241],
+                        [-68.09433, -16.56290],
+                        [-68.09579, -16.56366],
+                        [-68.09590, -16.56407],
+                        [-68.09495, -16.56474],
+                        [-68.09354, -16.56449],
+                        [-68.09309, -16.56537],
+                        [-68.09341, -16.56701],
+                        [-68.09133, -16.56740],
+                        [-68.08804, -16.56804],
+                        [-68.08493, -16.57059],
+                        [-68.08372, -16.57194]]
+                    }
+                }
+            ]
+        };
+
+        // Datos GeoJSON de polígonos
+        // const poligonosData = {
+        //   "type": "FeatureCollection",
+        //   "features": [
+        //     {
+        //       "type": "Feature",
+        //       "properties": { "name": "Estacion Azul Rio Seco", "descripcion": "Waña Jawira", "imagen": "static/img/azul_rio_seco.jpg"},
+        //       "geometry": {
+        //         "type": "Polygon",
+        //         "coordinates": [
+        //           [
+        //             [-68.20999,-16.48979],
+        //             [-68.20960,-16.48985],
+        //             [-68.20959,-16.49002],
+        //             [-68.20946,-16.49002],
+        //             [-68.20946,-16.49009],
+        //             [-68.20972,-16.49020],
+        //             [-68.20972,-16.49020],
+        //             [-68.20999,-16.48979]
+        //           ]
+        //         ]
+        //       }
+        //     }
+        //   ]
+        // };
+        // Datos GeoJSON de puntos
+        const puntosData = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Mirador de Killi Killi",
+                        "descripcion": "Un punto panorámico que ofrece vistas impresionantes <br>de La Paz y del monte Illimani. <br>Ideal para fotografías y disfrutar de la vista de la ciudad.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.127662, -16.494967]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Plaza Murillo",
+                        "descripcion": "El centro político de Bolivia, rodeado por el Palacio<br> de Gobierno, la Catedral Metropolitana<br> y el Congreso Nacional. Es un sitio emblemático lleno de historia.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.133178, -16.495712]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Museo Nacinal de Arte",
+                        "descripcion": "Un museo que alberga una amplia colección de arte <br>colonial y contemporáneo boliviano.<br> Su edificio es una joya arquitectónica del período colonial.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.134135, -16.495825]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Basilica de San francisco",
+                        "descripcion": "Un templo barroco mestizo del siglo XVI, conocido <br>por su fachada esculpida y su imponente interior.<br> Es uno de los símbolos arquitectónicos más destacados de La Paz.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.137160, -16.496655]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Museo de la Coca",
+                        "descripcion": "Un museo dedicado a la historia y el impacto cultural<br> de la hoja de coca en Bolivia. <br>Explica su uso tradicional y su importancia en la sociedad andina.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.138319, -16.497568]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Mercado de las brujas",
+                        "descripcion": "Un mercado único donde se venden productos<br> místicos y rituales, como amuletos, hierbas medicinales y figuras<br> tradicionales de la cultura andina.",
+                        "imagen": "static/img/OIP.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.138775, -16.496404]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Calle apolinar",
+                        "descripcion": "Aunque no es tan conocida como la Calle Jaén,<br> es una vía histórica con arquitectura colonial <br>que refleja la herencia cultural de la ciudad.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.135870, -16.492177]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Valle de la Luna",
+                        "descripcion": "Un paisaje surrealista formado por erosión de la tierra, con formaciones rocosas que parecen de otro planeta. Se encuentra a pocos kilómetros del centro de la ciudad.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.09570, -16.56296]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Parque Nacional Mallasa",
+                        "descripcion": "Un área natural famosa por sus formaciones rocosas únicas y su biodiversidad.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.084706, -16.570504]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Valle de las Ánimas",
+                        "descripcion": "Conocido por sus imponentes formaciones geológicas que asemejan figuras espirituales.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.02446, -16.54191]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Chacaltaya",
+                        "descripcion": "Una antigua estación de esquí situada en la Cordillera de los Andes.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.1304, -16.3544]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Parque Laguna de Cota Cota",
+                        "descripcion": "Un parque amplio con una laguna central, ideal para paseos y actividades al aire libre.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.0978, -16.5308]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Plaza Humboldt",
+                        "descripcion": "Ubicada entre los barrios de Calacoto y La Florida, es un lugar de encuentro popular con áreas verdes y espacios para el descanso.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.1079, -16.5231]
+                    }
+                }
+                ,
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Avenida Kantutani",
+                        "descripcion": "Una vía de acceso rápido que conecta la Zona Sur con el centro paceño, ofreciendo vistas panorámicas impresionantes.",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.1300, -16.5150]
+                    }
+                }
+                ,
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "Valle de Aranjuez",
+                        "descripcion": "stacado por sus rutas de escalada deportiva y caminatas. Ofrece más de 80 rutas de escalada con diferentes niveles de dificultad y vistas espectaculares desde sus cimas",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.099707, -16.556629]
+                    }
+                }
+                ,
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "El Montículo",
+                        "descripcion": "Un mirador icónico con vistas panorámicas de la ciudad, jardines floridos y una capilla histórica. Es un lugar ideal para disfrutar de la tranquilidad y la historia de La Paz",
+                        "imagen": "static/img/Mirador Virgen Blanca.jpg"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-68.1328, -16.5083]
+                    }
+                }
+            ]
+        };
+
+        // Crear capas para rutas
+        rutasData.features.forEach((feature) => {
+            const color =
+                feature.properties.name === "Ruta Linea Azul" ? 'blue' : 'red';
+
+            const layer = L.geoJSON(feature, {
+                style: {
+                    color: color,
+                    weight: 4
+                }
+            }).bindPopup(`
+        <strong>${feature.properties.name}</strong><br>
+        ${feature.properties.descripcion}
+      `);
+
+            rutasLayers[feature.properties.name] = layer;
+        });
+
+        // // Crear capas para los polígonos
+        // poligonosData.features.forEach((feature) => {
+        //   const color = 
+        //   feature.properties.name === "Estacion Azul Rio Seco" ? 'navy' :'#FFFFFF';
+        //   const fillColor = 
+        //   feature.properties.name === "Estacion Azul Rio Seco" ? 'navy' : '#FFFFFF';
+        //   const polygonLayer = L.geoJSON(feature, {
+        //     style: {
+        //       color: color,
+        //       fillColor: fillColor,
+        //       fillOpacity: 0.8,
+        //       weight: 4
+        //     }
+        //   }).bindPopup(`
+        //   <img src="${feature.properties.imagen}" alt="${feature.properties.name}" style="width: 200px; height: auto;"/>
+        //     <br>
+        //     <strong>${feature.properties.name}</strong><br>
+
+        //     ${feature.properties.descripcion}
+
+        //   `);
+
+        //   poligonosLayers[feature.properties.name] = polygonLayer;
+        // });
+        //ruta puntos
+        puntosData.features.forEach((feature) => {
+            const markerLayer = L.geoJSON(feature, {
+                pointToLayer: (feature, latlng) => {
+                    return L.marker(latlng);
+                }
+            }).bindPopup(`
+    <img src="${feature.properties.imagen}" alt="${feature.properties.name}" style="width: 200px; height: auto;"/>
+    <br>
+    <strong>${feature.properties.name}</strong><br>
+    ${feature.properties.descripcion}
+  `);
+
+            puntosLayers[feature.properties.name] = markerLayer;
+        });
+
+        // Añadir todas las rutas y polígonos al mapa por defecto
+        Object.values(rutasLayers).forEach(layer => layer.addTo(map));
+        // Object.values(poligonosLayers).forEach(layer => layer.addTo(map));
+        Object.values(puntosLayers).forEach(layer => layer.addTo(map));
+
+        // Control de capas
+        L.control.layers(null, { ...rutasLayers, ...poligonosLayers }).addTo(map);
+
+        // Añadir funcionalidad de clic para agregar marcadores
+        map.on('click', (e) => {
+            const { lat, lng } = e.latlng;
+            const marker = L.marker([lat, lng]).addTo(map);
+            marker.bindPopup(`<strong>Punto marcado:</strong><br>Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`).openPopup();
+        });
+
+        // Control para mostrar información adicional
+        const info = L.control();
+        info.onAdd = function () {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+        info.update = function (props) {
+            this._div.innerHTML = props
+                ? `<h4>Información</h4><b>${props.name}</b><br>${props.descripcion}`
+                : `<h4>Haz clic en una ruta o área para más detalles</h4>`;
+        };
+        info.addTo(map);
+
+        // Actualizar información al pasar el mouse sobre una ruta o polígono
+        Object.values(rutasLayers).forEach(layer => {
+            layer.on('mouseover', (e) => info.update(e.layer.feature.properties));
+            layer.on('mouseout', () => info.update());
+        });
+
+        // Object.values(poligonosLayers).forEach(layer => {
+        //   layer.on('mouseover', (e) => info.update(e.layer.feature.properties));
+        //   layer.on('mouseout', () => info.update());
+        // });
+        Object.values(puntosLayers).forEach(layer => {
+            layer.on('mouseover', (e) => info.update(e.layer.feature.properties));
+            layer.on('mouseout', () => info.update());
+        });
+    </script>
+</body>
+
+</html>

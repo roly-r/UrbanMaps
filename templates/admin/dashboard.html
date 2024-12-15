@@ -1,0 +1,101 @@
+{% include 'header.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Maps - Inicio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/dash.css') }}">
+</head>
+<body>
+    <br>
+    <br>
+    <br>
+
+<div class="card-group">
+    <div class="card card text-bg-dark mb-3">
+      <img src="/static/images/LAPAZ.jpg" class="card-img-top" alt="La Paz" width="100" height="300">
+      <div class="card-body">
+        <h5 class="card-title">Explora La Paz</h5>
+        <p class="card-text">
+            <li>Descubre la riqueza cultural, histórica y natural de La Paz con nuestros recorridos guiados.</li>
+            <li>Visita mercados vibrantes, plazas emblemáticas y disfruta de las vistas desde los teleféricos.</li>
+            <li>Ofrecemos una experiencia personalizada adaptada a tus intereses y tiempo.</li>
+        </p>
+      </div>
+    </div>
+    <div class="card card text-bg-dark mb-3">
+      <img src="/static/images/urban maps.webp" class="card-img-top" alt="Urban Maps Logo" width="100" height="300">
+      <div class="card-body">
+        <h5 class="card-title">Nuestras Ventajas</h5>
+        <p class="card-text">
+            <li>Guías expertos y amigables.</li>
+            <li>Rutas únicas y memorables.</li>
+            <li>Flexibilidad en itinerarios.</li>
+            <li>Información rica y detallada sobre cada punto de interés.</li>
+            <li>Experiencias seguras y cómodas.</li>
+        </p>
+      </div>
+    </div>
+    <div class="card card text-bg-dark mb-3">
+      <img src="/static/images/mapa.jpg" class="card-img-top" alt="Mapa de La Paz" width="200" height="300">
+      <div class="card-body">
+        <h5 class="card-title">Conoce El Alto</h5>
+        <p class="card-text">
+            <li>Explora las alturas y la autenticidad cultural de El Alto con nuestras rutas guiadas.</li>
+            <li>Descubre miradores panorámicos, mercados coloridos y la esencia de su comunidad.</li>
+            <li>Rutas que conectan El Alto y La Paz para una experiencia completa.</li>
+        </p>
+      </div>
+    </div>
+  </div>
+  <a class="btn btn-outline-light" href="{{url_for('mapas.index_maps')}}" >Mapas</a>
+  <div class="mt-4">
+    <h3 class="mb-3">Nuestros Servicios</h3>
+
+    
+    <ol class="list-group list-group-numbered">
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Recorridos Históricos</div>
+          Explora lugares emblemáticos de La Paz y su historia fascinante.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">1</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Experiencias Culturales</div>
+          Sumérgete en las tradiciones, arte y sabores locales.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">2</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Rutas Panorámicas</div>
+          Disfruta vistas impresionantes desde los puntos más altos de la ciudad.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">3</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Tours Personalizados</div>
+          Solicita tu conductor-guia experimentado segun tus gustos.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">4</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Eventos Especiales</div>
+          Organizamos recorridos para eventos y grupos.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">5</span>
+      </li>
+    </ol>
+  </div>
+</div>
+
+</body>
+</html>
+
+{% include 'footer.html' %}

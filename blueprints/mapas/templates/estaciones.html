@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teleferico</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        #map {
+            width: 100%;
+            height: 90vh;
+        }
+
+        .info {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #b1edf1;
+        }
+
+        button {
+            margin-left: 10px;
+        }
+
+        #removeLocationButton {
+            background-color: #000;
+            color: white;
+        }
+
+        #locateButton {
+            background-color: #007bff;
+            color: white;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #000000;
+            padding: 5px;
+        }
+
+        select {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 5px;
+            font-size: 14px;
+            width: auto;
+            text-align: left;
+        }
+
+        #info-box {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #route-description {
+            margin-top: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #removeLocationButton {
+            position: absolute;
+            top: 75px;
+            right: 10px;
+            z-index: 1000;
+            padding: 10px 20px;
+            background-color: #000000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        #locateButton {
+            position: absolute;
+            top: 75px;
+            right: 150px;
+            z-index: 1000;
+            padding: 10px 20px;
+            background-color: #005f85;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Rutas y Estaciones TELEFERICO</h1>
+
+        <button id="locateButton">Mostrar mi ubicación</button>
+
+        <select id="select-location">
+            <option value="">selecione una ruta</option>
+            <option value="-16.49762,-68.16456">Estacion Teleferico Rojo 16 de Julio</option>
+            <option value="-16.49815,-68.15282">Estacion Teleferico Rojo Cementerio</option>
+            <option value="-16.49145,-68.14472">Estacion Teleferico Rojo Estacion Central</option>
+            <option value="-16.49848,-68.16458">Estacion Teleferico Azul - Plomo 16 de Julio</option>
+            <option value="-16.49483,-68.17351">Estacion Teleferico Azul Plaza Libertad</option>
+            <option value="-16.49229,-68.18308">Estacion Teleferico Azul Plaza La Paz</option>
+            <option value="-16.48954,-68.19308">Estacion Teleferico Azul UPEA</option>
+            <option value="-16.48998,-68.20982">Estacion Teleferico Azul Rio Seco</option>
+            <option value="-16.51934,-68.14980">Estacion Teleferico Plomo Mirador</option>
+            <option value="-16.51227,-68.15372">Estacion Teleferico Plomo - Morado Faro Murillo</option>
+            <option value="-16.52271,-68.16953">Estacion Teleferico Morado 6 de Marzo</option>
+            <option value="-16.49998,-68.13520">Estacion Teleferico Morado Correos</option>
+            <option value="-16.51828,-68.15006">Estacion Teleferico Amarillo Mirador</option>
+            <option value="-16.51545,-68.14413">Estacion Teleferico Amarillo Buenos Aires</option>
+            <option value="-16.51464,-68.13031">Estacion Teleferico Amarillo Sopocachi</option>
+            <option value="-16.51900,-68.11605">Estacion Teleferico Amarillo - Verde - Celeste Libertador</option>
+            <option value="-16.52140,-68.11025">Estacion Teleferico Verde Alto Obrajes</option>
+            <option value="-16.52683,-68.10071">Estacion Teleferico Verde Obraje</option>
+            <option value="-16.53815,-68.08735">Estacion Teleferico Verde Irpavi</option>
+            <option value="-16.50040,-68.13271">Estacion Teleferico Celeste Camacho</option>
+            <option value="-16.50415,-68.12605">Estacion Teleferico Celeste Teatro al Aire Libre</option>
+            <option value="-16.51121,-68.12030">Estacion Teleferico Celeste Av. Poeta</option>
+            <option value="-16.51085,-68.12126">Estacion Teleferico Blanco Av. Poeta</option>
+            <option value="-16.50410,-68.12083">Estacion Teleferico Blanco Plaza Triangular</option>
+            <option value="-16.49368,-68.12137">Estacion Teleferico Blanco Monumento Bush</option>
+            <option value="-16.48445,-68.12190">Estacion Teleferico Blanco - Naranja Plaza Villarroel</option>
+            <option value="-16.48649,-68.13128">Estacion Teleferico Naranja Periferica</option>
+            <option value="-16.49036,-68.13686">Estacion Teleferico Naranja Armentia</option>
+            <option value="-16.49207,-68.14497">Estacion Teleferico Naranja Estacion Central</option>
+        </select>
+
+    </div>
+
+    <div id="info-box">
+        <div id="router-description"></div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+
+        const map = L.map('map').setView([-16.5105, -68.1625], 14); // Coordenadas de El Alto
+
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        
+
+        const routes = {
+            '-16.49762,-68.16456': { image: 'static/img/rojo_16_julio.jpg', description: 'Estacion Teleferico Rojo 16 de Julio' },
+            '-16.49815,-68.15282': { image: 'static/img/rojo_cementerio.jpg', description: 'Estacion Teleferico Rojo 16 de Julio' },
+            '-16.49145,-68.14472': { image: 'static/img/rojo_estacion_central.jpg', description: 'Estacion Teleferico Rojo Estacion Central' },
+            '-16.49848,-68.16458': { image: 'static/img/plateado_16_julio.jpg', description: 'Estacion Teleferico Azul - Plomo 16 de Julio' },
+            '-16.49483,-68.17351': { image: 'static/img/azul_plaza_libertad.jpg', description: 'Estacion Teleferico Azul Plaza Libertad' },
+            '-16.49229,-68.18308': { image: 'static/img/azul_plaza_la_paz.jpg', description: 'Estacion Teleferico Azul Plaza La Paz' },
+            '-16.48954,-68.19308': { image: 'static/img/azul_upea.jpg', description: 'Estacion Teleferico Azul UPEA' },
+            '-16.48998,-68.20982': { image: 'static/img/azul_rio_seco.jpg', description: 'Estacion Teleferico Azul Rio Seco' },
+            '-16.51934,-68.14980': { image: 'static/img/plateado_mirador.jpg', description: 'Estacion Teleferico Plomo Mirador' },
+            '-16.51227,-68.15372': { image: 'static/img/plateado_faro_murillo.jpg', description: 'Estacion Teleferico Plomo - Morado Faro Murillo' },
+            '-16.52271,-68.16953': { image: 'static/img/morado_6_marzo.jpg', description: 'Estacion Teleferico Morado 6 de Marzo' },
+            '-16.49998,-68.13520': { image: 'static/img/morado_obelisco.jpg', description: 'Estacion Teleferico Morado Correos' },
+            '-16.51828,-68.15006': { image: 'static/img/plateado_mirador.jpg', description: 'Estacion Teleferico Amarillo Mirador' },
+            '-16.51545,-68.14413': { image: 'static/img/amarillo_buenos_aires.jpg', description: 'Estacion Teleferico Amarillo Buenos Aires' },
+            '-16.51464,-68.13031': { image: 'static/img/amarillo_sopocachi.jpg', description: 'Estacion Teleferico Amarillo Sopocachi' },
+            '-16.51900,-68.11605': { image: 'static/img/amarillo_libertador.jpg', description: 'Estacion Teleferico Amarillo - Verde - Celeste Libertador' },
+            '-16.52140,-68.11025': { image: 'static/img/verde_alto_obrajes.jpg', description: 'Estacion Teleferico Verde Alto Obrajes' },
+            '-16.52683,-68.10071': { image: 'static/img/verde_obrajes.jpg', description: 'Estacion Teleferico Verde Obraje' },
+            '-16.53815,-68.08735': { image: 'static/img/verde_irpavi.jpg', description: 'Estacion Teleferico Verde Irpavi' },
+            '-16.50040,-68.13271': { image: 'static/img/celeste_camacho.jpg', description: 'Estacion Teleferico Celeste Camacho' },
+            '-16.50415,-68.12605': { image: 'static/img/celeste_libre.jpg', description: 'Estacion Teleferico Celeste Teatro al Aire Libre' },
+            '-16.51121,-68.12030': { image: 'static/img/celeste_av_poeta.jpg', description: 'Estacion Teleferico Celeste Av. Poeta' },
+            '-16.51085,-68.12126': { image: 'static/img/blanco_poeta.jpg', description: 'Estacion Teleferico Blanco Av. Poeta' },
+            '-16.50410,-68.12083': { image: 'static/img/blanco_triangular.jpg', description: 'Estacion Teleferico Blanco Plaza Triangular' },
+            '-16.49368,-68.12137': { image: 'static/img/blanco_monumento_bush.jpg', description: 'Estacion Teleferico Blanco Monumento Bush' },
+            '-16.48445,-68.12190': { image: 'static/img/blanco_villaroel.jpg', description: 'Estacion Teleferico Blanco - Naranja Plaza Villarroel' },
+            '-16.48649,-68.13128': { image: 'static/img/naranja_periferica.jpg', description: 'Estacion Teleferico Naranja Periferica' },
+            '-16.49036,-68.13686': { image: 'static/img/naranja_riosinho.jpg', description: 'Estacion Teleferico Naranja Armentia' },
+            '-16.49207,-68.14497': { image: 'static/img/naranja_estacion_central.jpg', description: 'Estacion Teleferico Naranja Estacion Central' }
+        };
+
+        const rutasLayers = {};
+        const poligonosLayers = {};
+
+        const rutasData = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta Linea Azul", "descripcion": "Desde Ex Tranca de Rio Seco Hasta Av. Panoramica" },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.20960, -16.48993], [-68.19321, -16.48948], [-68.17357, -16.49484], [-68.16489, -16.49830]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta Linea Roja", "descripcion": "Desde Av. Panoramica zona 16 de Julio hasta Estacion Central" },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.16429, -16.49740], [-68.15280, -16.49814], [-68.14485, -16.49155]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta Linea Plateada", "descripcion": "Desde Av. Panoramica zona 16 de Julio hasta Zona Ciudad Satélite" },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.16441, -16.49881], [-68.15374, -16.51225], [-68.14988, -16.51923]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta Linea Morada", "descripcion": "Desde Av. 6 de Marzo hasta Edificio Correos" },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.16946, -16.52270], [-68.15373, -16.51228], [-68.13534, -16.50008]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta Linea Celeste", "descripcion": "Desde Av. Camcho hasta La Curva de Holguin" },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.13254, -16.50048], [-68.12604, -16.50415], [-68.12030, -16.51121], [-68.11628, -16.51845]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta Linea Amarilla", "descripcion": "Desde Zona Ciudad Satélite hasta La Curva de Holguin" },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.14989, -16.51823], [-68.14410, -16.51544], [-68.14410, -16.51544], [-68.13033, -16.51467], [-68.11631, -16.51901]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta Linea Verde", "descripcion": "Desde La Curva de Holguin hasta Calacoto, Zona Irpavi" },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.11581, -16.51914], [-68.11041, -16.52158], [-68.10069, -16.52681], [-68.09039, -16.53539], [-68.08741, -16.53808]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta Linea Naranja", "descripcion": "Desde Estacion Central hasta Plaza Villarroel" },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.14458, -16.49200], [-68.13687, -16.49036], [-68.13128, -16.48649], [-68.12218, -16.48478]]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Ruta Linea Blanca", "descripcion": "Desde Plaza Villarroel hasta Avenida del Poeta" },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-68.12180, -16.48477], [-68.12086, -16.50403], [-68.12102, -16.50700], [-68.12109, -16.51054], [-68.12118, -16.51070]]
+                    }
+                }
+            ]
+        };
+
+        const poligonosData = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Azul Rio Seco", "descripcion": "Waña Jawira", "imagen": "static/img/azul_rio_seco.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.20999, -16.48979],
+                                [-68.20960, -16.48985],
+                                [-68.20959, -16.49002],
+                                [-68.20946, -16.49002],
+                                [-68.20946, -16.49009],
+                                [-68.20972, -16.49020],
+                                [-68.20972, -16.49020],
+                                [-68.20999, -16.48979]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Azul UPEA", "descripcion": "Yatina Uta", "imagen": "static/img/azul_upea.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.19340, -16.48939],
+                                [-68.19320, -16.48937],
+                                [-68.19303, -16.48941],
+                                [-68.19308, -16.48961],
+                                [-68.19322, -16.48957],
+                                [-68.19340, -16.48958],
+                                [-68.19340, -16.48939]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Azul Plaza La Paz", "descripcion": "Suma Kamaña", "imagen": "static/img/azul_plaza_la_paz.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.18320, -16.49216],
+                                [-68.18287, -16.49224],
+                                [-68.18293, -16.49245],
+                                [-68.18331, -16.49235],
+                                [-68.18320, -16.49216]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Azul Plaza Libertad", "descripcion": "Qhana Thaki", "imagen": "static/img/azul_plaza_libertad.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.17374, -16.49469],
+                                [-68.17348, -16.49476],
+                                [-68.17336, -16.49482],
+                                [-68.17347, -16.49504],
+                                [-68.17357, -16.49498],
+                                [-68.17381, -16.49492],
+                                [-68.17374, -16.49469]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Azul 16 de Julio", "descripcion": "Jacha Qhathu", "imagen": "static/img/azul_16_julio.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.16492, -16.49824],
+                                [-68.16456, -16.49799],
+                                [-68.16448, -16.49810],
+                                [-68.16454, -16.49814],
+                                [-68.16434, -16.49841],
+                                [-68.16465, -16.49860],
+                                [-68.16492, -16.49824]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Rojo 16 de Julio", "descripcion": "Jacha Qhathu", "imagen": "static/img/rojo_16_julio.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.16486, -16.49738],
+                                [-68.16468, -16.49725],
+                                [-68.16437, -16.49727],
+                                [-68.16439, -16.49775],
+                                [-68.16476, -16.49798],
+                                [-68.16473, -16.49755],
+                                [-68.16486, -16.49738]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Rojo Cementerio", "descripcion": "Ajayuni", "imagen": "static/img/rojo_cementerio.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.15299, -16.49801],
+                                [-68.15281, -16.49801],
+                                [-68.15273, -16.49796],
+                                [-68.15261, -16.49811],
+                                [-68.15278, -16.49824],
+                                [-68.15300, -16.49822],
+                                [-68.15299, -16.49801]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Rojo Estacion Central", "descripcion": "Taypi Uta", "imagen": "static/img/rojo_estacion_central.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.14492, -16.49146],
+                                [-68.14461, -16.49121],
+                                [-68.14454, -16.49143],
+                                [-68.14477, -16.49163],
+                                [-68.14492, -16.49146]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Plateada 16 de Julio", "descripcion": "Jacha Qhathu", "imagen": "static/img/plateado_16_julio.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.16469, -16.49863],
+                                [-68.16434, -16.49841],
+                                [-68.16428, -16.49849],
+                                [-68.16445, -16.49861],
+                                [-68.16436, -16.49873],
+                                [-68.16453, -16.49885],
+                                [-68.16469, -16.49863]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Integracion Faro Murillo", "descripcion": "Tiquira", "imagen": "static/img/plateado_faro_murillo.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.15406, -16.51236],
+                                [-68.15395, -16.51229],
+                                [-68.15402, -16.51220],
+                                [-68.15378, -16.51204],
+                                [-68.15382, -16.51198],
+                                [-68.15377, -16.51194],
+                                [-68.15389, -16.51175],
+                                [-68.15380, -16.51170],
+                                [-68.15358, -16.51172],
+                                [-68.15339, -16.51199],
+                                [-68.15346, -16.51204],
+                                [-68.15337, -16.51218],
+                                [-68.15343, -16.51222],
+                                [-68.15339, -16.51229],
+                                [-68.15370, -16.51249],
+                                [-68.15359, -16.51266],
+                                [-68.15376, -16.51276],
+                                [-68.15406, -16.51236]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Plateada Mirador", "descripcion": "Qhana Pata", "imagen": "static/img/plateado_mirador.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.14991, -16.51925],
+                                [-68.14977, -16.51919],
+                                [-68.14973, -16.51953],
+                                [-68.14987, -16.51960],
+                                [-68.14991, -16.51925]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Amarillo Mirador", "descripcion": "Qhana Pata", "imagen": "static/img/amarillo_mirador.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.15054, -16.51797],
+                                [-68.15036, -16.51781],
+                                [-68.15003, -16.51814],
+                                [-68.14993, -16.51810],
+                                [-68.14984, -16.51828],
+                                [-68.14988, -16.51870],
+                                [-68.14997, -16.51871],
+                                [-68.15013, -16.51843],
+                                [-68.15011, -16.51841],
+                                [-68.15017, -16.51833],
+                                [-68.15054, -16.51797]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Amarillo Buenos Aires", "descripcion": "Quta Uma", "imagen": "static/img/amarillo_buenos_aires.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.14429, -16.51541],
+                                [-68.14418, -16.51535],
+                                [-68.14393, -16.51534],
+                                [-68.14392, -16.51553],
+                                [-68.14407, -16.51554],
+                                [-68.14419, -16.51560],
+                                [-68.14429, -16.51541]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Amarillo Sopocachi", "descripcion": "Supa Kachi", "imagen": "static/img/amarillo_sopocachi.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.13044, -16.51454],
+                                [-68.13030, -16.51453],
+                                [-68.13009, -16.51459],
+                                [-68.13016, -16.51480],
+                                [-68.13030, -16.51476],
+                                [-68.13044, -16.51476],
+                                [-68.13044, -16.51454]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Amarillo Libertador", "descripcion": "Chuqi Apu", "imagen": "static/img/amarillo_libertador.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.11629, -16.51887],
+                                [-68.11582, -16.51900],
+                                [-68.11584, -16.51909],
+                                [-68.11580, -16.51911],
+                                [-68.11585, -16.51927],
+                                [-68.11602, -16.51922],
+                                [-68.11605, -16.51931],
+                                [-68.11621, -16.51927],
+                                [-68.11618, -16.51916],
+                                [-68.11635, -16.51911],
+                                [-68.11629, -16.51887]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Verde Alto Obrajes", "descripcion": "Pata Obrajes", "imagen": "static/img/verde_alto_obrajes.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.11051, -16.52140],
+                                [-68.11030, -16.52151],
+                                [-68.11034, -16.52157],
+                                [-68.11025, -16.52162],
+                                [-68.11029, -16.52168],
+                                [-68.11037, -16.52164],
+                                [-68.11041, -16.52170],
+                                [-68.11062, -16.52159],
+                                [-68.11051, -16.52140]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Verde Obrajes", "descripcion": "Aynacha Obrajes", "imagen": "static/img/verde_obrajes.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.10082, -16.52664],
+                                [-68.10069, -16.52671],
+                                [-68.10052, -16.52686],
+                                [-68.10065, -16.52701],
+                                [-68.10079, -16.52689],
+                                [-68.10092, -16.52682],
+                                [-68.10082, -16.52664]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Verde Irpavi", "descripcion": "Irpawi", "imagen": "static/img/verde_irpavi.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.08738, -16.53793],
+                                [-68.08716, -16.53812],
+                                [-68.08721, -16.53828],
+                                [-68.08730, -16.53825],
+                                [-68.08744, -16.53814],
+                                [-68.08738, -16.53793]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Morado 6 de Marzo", "descripcion": "Jacha haki", "imagen": "static/img/morado_6_marzo.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.16979, -16.52254],
+                                [-68.16935, -16.52226],
+                                [-68.16927, -16.52239],
+                                [-68.16954, -16.52257],
+                                [-68.16943, -16.52273],
+                                [-68.16954, -16.52280],
+                                [-68.16965, -16.52264],
+                                [-68.16970, -16.52266],
+                                [-68.16979, -16.52254]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Morado Obelisco", "descripcion": "Utjawi", "imagen": "static/img/morado_obelisco.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.13540, -16.49999],
+                                [-68.13517, -16.49982],
+                                [-68.13496, -16.49995],
+                                [-68.13524, -16.50012],
+                                [-68.13528, -16.50008],
+                                [-68.13532, -16.50010],
+                                [-68.13536, -16.50004],
+                                [-68.13532, -16.50001],
+                                [-68.13540, -16.49999]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Celeste Camacho", "descripcion": "Prado", "imagen": "static/img/celeste_camacho.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.13298, -16.50048],
+                                [-68.13294, -16.50040],
+                                [-68.13289, -16.50040],
+                                [-68.13280, -16.50030],
+                                [-68.13252, -16.50044],
+                                [-68.13257, -16.50053],
+                                [-68.13260, -16.50053],
+                                [-68.13276, -16.50068],
+                                [-68.13290, -16.50053],
+                                [-68.13298, -16.50048]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Celeste Teatro al Aire Libre", "descripcion": "Cancha Zapata", "imagen": "static/img/celeste_libre.png" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.12621, -16.50416],
+                                [-68.12612, -16.50403],
+                                [-68.12603, -16.50408],
+                                [-68.12599, -16.50405],
+                                [-68.12589, -16.50418],
+                                [-68.12608, -16.50432],
+                                [-68.12617, -16.50420],
+                                [-68.12616, -16.50419],
+                                [-68.12621, -16.50416]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Celeste Av. Poeta", "descripcion": "Arce", "imagen": "static/img/celeste_av_poeta.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.12048, -16.51115],
+                                [-68.12043, -16.51111],
+                                [-68.12051, -16.51101],
+                                [-68.12045, -16.51096],
+                                [-68.12036, -16.51107],
+                                [-68.12031, -16.51105],
+                                [-68.12022, -16.51115],
+                                [-68.12013, -16.51130],
+                                [-68.12030, -16.51139],
+                                [-68.12035, -16.51131],
+                                [-68.12048, -16.51115]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Celeste Libertador", "descripcion": "Chuqui Apu", "imagen": "static/img/celeste_libertador.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.11637, -16.51850],
+                                [-68.11623, -16.51843],
+                                [-68.11618, -16.51851],
+                                [-68.11604, -16.51855],
+                                [-68.11580, -16.51831],
+                                [-68.11562, -16.51844],
+                                [-68.11597, -16.51881],
+                                [-68.11627, -16.51868],
+                                [-68.11637, -16.51850]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Naranja Estacion Central", "descripcion": "Taypi Uta", "imagen": "static/img/naranja_estacion_central.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.14516, -16.49207],
+                                [-68.14499, -16.49195],
+                                [-68.14495, -16.49200],
+                                [-68.14461, -16.49193],
+                                [-68.14458, -16.49208],
+                                [-68.14492, -16.49215],
+                                [-68.14493, -16.49219],
+                                [-68.14508, -16.49218],
+                                [-68.14516, -16.49207]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Naranja Plaza Riosinho", "descripcion": "Riosinho Pampa", "imagen": "static/img/naranja_riosinho.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.13710, -16.49033],
+                                [-68.13691, -16.49027],
+                                [-68.13671, -16.49016],
+                                [-68.13659, -16.49032],
+                                [-68.13683, -16.49047],
+                                [-68.13707, -16.49051],
+                                [-68.13710, -16.49033]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Naranja Periferica", "descripcion": "Apachita", "imagen": "static/img/naranja_periferica.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.13150, -16.48651],
+                                [-68.13135, -16.48639],
+                                [-68.13107, -16.48635],
+                                [-68.13104, -16.48653],
+                                [-68.13125, -16.48656],
+                                [-68.13144, -16.48672],
+                                [-68.13150, -16.48651]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Blanco Villarroel", "descripcion": "Inalmama", "imagen": "static/img/blanco_villaroel.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.12216, -16.48404],
+                                [-68.12161, -16.48401],
+                                [-68.12156, -16.48478],
+                                [-68.12199, -16.48480],
+                                [-68.12204, -16.48485],
+                                [-68.12220, -16.48483],
+                                [-68.12231, -16.48442],
+                                [-68.12217, -16.48440],
+                                [-68.12216, -16.48404]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Blanco Monumento a Bush", "descripcion": "Qhuirwa Uma", "imagen": "static/img/blanco_monumento_bush.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.12156, -16.49357],
+                                [-68.12114, -16.49356],
+                                [-68.12113, -16.49381],
+                                [-68.12154, -16.49383],
+                                [-68.12156, -16.49357]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Blanco Plaza Triangular", "descripcion": "Kimsachata", "imagen": "static/img/blanco_triangular.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.12098, -16.50400],
+                                [-68.12072, -16.50399],
+                                [-68.12080, -16.50434],
+                                [-68.12091, -16.50434],
+                                [-68.12098, -16.50400]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Estacion Blanco Av. Poeta", "descripcion": "Arce", "imagen": "static/img/blanco_poeta.jpg" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-68.12138, -16.51060],
+                                [-68.12120, -16.51060],
+                                [-68.12120, -16.51070],
+                                [-68.12111, -16.51070],
+                                [-68.12112, -16.51100],
+                                [-68.12105, -16.51110],
+                                [-68.12124, -16.51122],
+                                [-68.12144, -16.51091],
+                                [-68.12139, -16.51087],
+                                [-68.12138, -16.51060]
+                            ]
+                        ]
+                    }
+                }
+            ]
+        };
+
+        rutasData.features.forEach((feature) => {
+            const color =
+                feature.properties.name === "Ruta Linea Azul" ? 'blue' :
+                feature.properties.name === "Ruta Linea Roja" ? 'red' :
+                feature.properties.name === "Ruta Linea Morada" ? '#800080' :
+                feature.properties.name === "Ruta Linea Celeste" ? '#87CEEB' :
+                feature.properties.name === "Ruta Linea Amarilla" ? 'yellow' :
+                feature.properties.name === "Ruta Linea Verde" ? 'green' :
+                feature.properties.name === "Ruta Linea Naranja" ? 'orange' :
+                feature.properties.name === "Ruta Linea Blanca" ? 'white' :
+                feature.properties.name === "Ruta Linea Plateada" ? 'silver' : 'white';
+
+            const layer = L.geoJSON(feature, {
+                style: {
+                    color: color,
+                    weight: 4
+                }
+            }).bindPopup(`
+        <strong>${feature.properties.name}</strong><br>
+        ${feature.properties.descripcion}
+      `);
+
+            rutasLayers[feature.properties.name] = layer;
+        });
+
+        // Crear capas para los polígonos
+        poligonosData.features.forEach((feature) => {
+            const color =
+                feature.properties.name === "Estacion Azul Rio Seco" ? 'navy' :
+                feature.properties.name === "Estacion Azul UPEA" ? 'navy' :
+                feature.properties.name === "Estacion Azul Plaza La Paz" ? 'navy' :
+                feature.properties.name === "Estacion Azul Plaza Libertad" ? 'navy' :
+                feature.properties.name === "Estacion Azul 16 de Julio" ? 'navy' :
+                feature.properties.name === "Estacion Rojo 16 de Julio" ? '#8B0000' :
+                feature.properties.name === "Estacion Rojo Estacion Central" ? '#8B0000' :
+                feature.properties.name === "Estacion Rojo Cementerio" ? '#8B0000' :
+                feature.properties.name === "Estacion Plateada 16 de Julio" ? '#808080' :
+                feature.properties.name === "Estacion Integracion Faro Murillo" ? 'purple' :
+                feature.properties.name === "Estacion Plateada Mirador" ? '#808080' :
+                feature.properties.name === "Estacion Amarillo Mirador" ? '#FFD700' :
+                feature.properties.name === "Estacion Amarillo Buenos Aires" ? '#FFD700' :
+                feature.properties.name === "Estacion Amarillo Sopocachi" ? '#FFD700' :
+                feature.properties.name === "Estacion Amarillo Libertador" ? '#FFD700' :
+                feature.properties.name === "Estacion Verde Alto Obrajes" ? '#006400' :
+                feature.properties.name === "Estacion Verde Obrajes" ? '#006400' :
+                feature.properties.name === "Estacion Verde Irpavi" ? '#006400' :
+                feature.properties.name === "Estacion Morado 6 de Marzo" ? '#5D3A6A' :
+                feature.properties.name === "Estacion Morado Obelisco" ? '#5D3A6A' :
+                feature.properties.name === "Estacion Celeste Camacho" ? '#649EDB' :
+                feature.properties.name === "Estacion Celeste Teatro al Aire Libre" ? '#649EDB' :
+                feature.properties.name === "Estacion Celeste Av. Poeta" ? '#649EDB' :
+                feature.properties.name === "Estacion Celeste Libertador" ? '#649EDB' :
+                feature.properties.name === "Estacion Naranja Estacion Central" ? '#FFA500' :
+                feature.properties.name === "Estacion Naranja Plaza Riosinho" ? '#FFA500' :
+                feature.properties.name === "Estacion Naranja Periferica" ? '#FFA500' :
+                feature.properties.name === "Estacion Blanco Villarroel" ? '#FFA500' :
+                feature.properties.name === "Estacion Blanco Monumento a Bush" ? '#FFFFFF' :
+                feature.properties.name === "Estacion Blanco Plaza Triangular" ? '#FFFFFF' :
+                feature.properties.name === "Estacion Blanco Av. Poeta" ? '#FFFFFF' : '#FFFFFF';
+            const fillColor =
+                feature.properties.name === "Estacion Azul Rio Seco" ? 'navy' :
+                feature.properties.name === "Estacion Azul UPEA" ? 'navy' :
+                feature.properties.name === "Estacion Azul Plaza La Paz" ? 'navy' :
+                feature.properties.name === "Estacion Azul Plaza Libertad" ? 'navy' :
+                feature.properties.name === "Estacion Azul 16 de Julio" ? 'navy' :
+                feature.properties.name === "Estacion Rojo 16 de Julio" ? '#8B0000' :
+                feature.properties.name === "Estacion Rojo Estacion Central" ? '#8B0000' :
+                feature.properties.name === "Estacion Rojo Cementerio" ? '#8B0000' :
+                feature.properties.name === "Estacion Plateada 16 de Julio" ? '#808080' :
+                feature.properties.name === "Estacion Integracion Faro Murillo" ? '#808080' :
+                feature.properties.name === "Estacion Plateada Mirador" ? '#808080' :
+                feature.properties.name === "Estacion Amarillo Mirador" ? '#FFD700' :
+                feature.properties.name === "Estacion Amarillo Buenos Aires" ? '#FFD700' :
+                feature.properties.name === "Estacion Amarillo Sopocachi" ? '#FFD700' :
+                feature.properties.name === "Estacion Amarillo Libertador" ? '#006400' :
+                feature.properties.name === "Estacion Verde Alto Obrajes" ? '#006400' :
+                feature.properties.name === "Estacion Verde Obrajes" ? '#006400' :
+                feature.properties.name === "Estacion Verde Irpavi" ? '#006400' :
+                feature.properties.name === "Estacion Morado 6 de Marzo" ? '#5D3A6A' :
+                feature.properties.name === "Estacion Morado Obelisco" ? '#5D3A6A' :
+                feature.properties.name === "Estacion Celeste Camacho" ? '#649EDB' :
+                feature.properties.name === "Estacion Celeste Teatro al Aire Libre" ? '#649EDB' :
+                feature.properties.name === "Estacion Celeste Av. Poeta" ? '#649EDB' :
+                feature.properties.name === "Estacion Celeste Libertador" ? '#649EDB' :
+                feature.properties.name === "Estacion Naranja Estacion Central" ? '#FFA500' :
+                feature.properties.name === "Estacion Naranja Plaza Riosinho" ? '#FFA500' :
+                feature.properties.name === "Estacion Naranja Periferica" ? '#FFA500' :
+                feature.properties.name === "Estacion Blanco Villarroel" ? '#FFFFFF' :
+                feature.properties.name === "Estacion Blanco Monumento a Bush" ? '#FFFFFF' :
+                feature.properties.name === "Estacion Blanco Plaza Triangular" ? '#FFFFFF' :
+                feature.properties.name === "Estacion Blanco Av. Poeta" ? '#FFFFFF' : '#FFFFFF';
+            const polygonLayer = L.geoJSON(feature, {
+                style: {
+                    color: color,
+                    fillColor: fillColor,
+                    fillOpacity: 0.8,
+                    weight: 4
+                }
+            }).bindPopup(`
+      <img src="${feature.properties.imagen}" alt="${feature.properties.name}" style="width: 200px; height: auto;"/>
+        <br>
+        <strong>${feature.properties.name}</strong><br>
+        
+        ${feature.properties.descripcion}
+        
+      `);
+
+            poligonosLayers[feature.properties.name] = polygonLayer;
+        });
+
+        Object.values(rutasLayers).forEach(layer => layer.addTo(map));
+        Object.values(poligonosLayers).forEach(layer => layer.addTo(map));
+
+        L.control.layers(null, { ...rutasLayers, ...poligonosLayers }).addTo(map);
+
+        Object.values(rutasLayers).forEach(layer => layer.addTo(map));
+
+        let currentMarker = null;
+        document.getElementById('select-location').addEventListener('change', function (e) {
+            let coords = e.target.value.split(",");
+            if (coords[0] !== "") {
+                map.flyTo(coords, 15);
+                if (currentMarker) {
+                    map.removeLayer(currentMarker);
+                }
+                currentMarker = L.marker(coords).addTo(map);
+                let info = routes[e.target.value];
+                let popupContent = `
+            <div style="text-align: center;">
+                <img src="${info.image}" alt="${info.description}" style="max-width: 100%;"/>
+                <p>${info.description}</p>
+            </div>
+        `;
+                currentMarker.bindPopup(popupContent).openPopup();
+                document.getElementById('router-description').innerHTML = info.description;
+            }
+        });
+
+        map.on('click', (e) => {
+            const { lat, lng } = e.latlng;
+            const marker = L.marker([lat, lng]).addTo(map);
+            marker.bindPopup(`<strong>Punto marcado:</strong><br>Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`).openPopup();
+        });
+
+        const info = L.control();
+        info.onAdd = function () {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+        info.update = function (props) {
+            this._div.innerHTML = props
+                ? `<h4>Información</h4><b>${props.name}</b><br>${props.descripcion}`
+                : `<h4>Haz clic en una ruta o área para más detalles</h4>`;
+        };
+        info.addTo(map);
+
+        Object.values(rutasLayers).forEach(layer => {
+            layer.on('mouseover', (e) => info.update(e.layer.feature.properties));
+            layer.on('mouseout', () => info.update());
+        });
+
+        Object.values(poligonosLayers).forEach(layer => {
+            layer.on('mouseover', (e) => info.update(e.layer.feature.properties));
+            layer.on('mouseout', () => info.update());
+        });
+
+        let locationMarker = null;
+        let locationCircle = null; 
+
+        document.getElementById('locateButton').addEventListener('click', function () {
+            map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
+        });
+
+        map.on('locationfound', function (e) {
+            const radius = e.accuracy / 2; 
+            const latlng = e.latlng;
+
+            if (locationMarker) {
+                map.removeLayer(locationMarker);
+            }
+            if (locationCircle) {
+                map.removeLayer(locationCircle);
+            }
+
+            locationMarker = L.marker(latlng)
+                .addTo(map)
+                .bindPopup(`Estás aquí. Precisión: ${Math.round(radius)} metros.`)
+                .openPopup();
+
+            locationCircle = L.circle(latlng, {
+                radius: radius,
+                color: 'blue',
+                fillColor: '#a4caff',
+                fillOpacity: 0.4
+            }).addTo(map);
+        });
+
+        map.on('locationerror', function (e) {
+            alert(`Error al obtener la ubicación: ${e.message}`);
+        });
+
+        const removeLocationButton = document.createElement('button');
+        removeLocationButton.id = 'removeLocationButton';
+        removeLocationButton.textContent = 'Quitar ubicación';
+
+        removeLocationButton.addEventListener('click', function () {
+            if (locationMarker) {
+                map.removeLayer(locationMarker);
+                locationMarker = null;
+            }
+            if (locationCircle) {
+                map.removeLayer(locationCircle);
+                locationCircle = null;
+            }
+        });
+
+        document.body.appendChild(removeLocationButton);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% include 'header.html' %}
+<br><br>
+<head>
+    <title>Buscar Pagos</title>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="fw-bold">RESULTADOS DE LA BUSQUEDA</h1>
+        <br>
+        <form action="{{ url_for('pagos.buscar') }}" method="POST" class="mb-4">
+            <div class="search-container">
+                <input type="text" name="termino" id="termino" 
+                       class="form-control" 
+                       value="{{ termino | default('') }}" 
+                       placeholder="Ingrese CI:" required>
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </div>
+        </form>
+
+        {% if pagos %}
+            <table class="table-gris">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>CI</th>
+                        <th>Monto</th>
+                        <th>Mes</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pago in pagos %}
+                    <tr>
+                        <td>{{ pago.cod_pm }}</td>
+                        <td>{{ pago.ci }}</td>
+                        <td>{{ pago.monto }}</td>
+                        <td>{{ pago.mes }}</td>
+                        <td>{{ pago.estado }}</td>
+                        <td>{{ pago.fecha }}</td>
+                        <td>{{ pago.descripcion }}</td>
+                        <td>
+                            <a href="/pagos/edit/{{ pago.cod_pm }}" class="btn btn-outline-info">Editar</a>
+                            <a href="/pagos/delete/{{ pago.cod_pm }}" class="btn btn-outline-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este pago?');">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <a href="{{ url_for('pagos.generar_reporte_pdf_busqueda', termino=termino) }}" class="btn btn-outline-primary">Generar PDF</a>
+        {% else %}
+            <!-- Mensaje si no se encuentran resultados -->
+            <div class="alert alert-warning mt-3" role="alert">
+                No se encontraron resultados para el término ingresado.
+            </div>
+        {% endif %}
+
+        <a href="{{ url_for('pagos.index') }}" class="btn btn-outline-light">Volver a Pagos</a>
+
+    </div>
+
+</body>
+{% include 'footer.html' %}

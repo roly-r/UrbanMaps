@@ -1,0 +1,134 @@
+{% include 'header.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Maps - Mapas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/dash.css') }}">
+</head>
+<body>
+    <br>
+    <br>
+    <br>
+
+<div class="card-group">
+    <div class="card card text-bg-dark mb-3">
+        <img src="/static/images/rutas centricas.png" class="card-img-top" alt="Turismo Céntrico en La Paz" width="200" height="200">
+        <div class="card-body">
+          <h5 class="card-title">Explora el Corazón de La Paz</h5>
+          <p class="card-text">
+            <ul>
+              <li>Adéntrate en el centro histórico de La Paz, donde la historia, la cultura y la modernidad se fusionan.</li>
+              <li>Visita la Plaza Murillo, el Mercado de las Brujas y disfruta de la arquitectura colonial y prehispánica.</li>
+              <li>Recorre los barrios más emblemáticos y disfruta de una vista panorámica de la ciudad desde el teleférico.</li>
+              <li>Experimenta un recorrido guiado que te conectará con las tradiciones y el alma de la ciudad paceña.</li>
+            </ul>
+          </p>
+          <!-- Botón Ver Mapa -->
+          <a href="{{ url_for('mapas.ver_rutas_centricas') }}" class="btn btn-primary">Ver Mapa</a>
+            </div>
+      </div>
+      
+      <div class="card card text-bg-dark mb-3">
+        <img src="/static/images/Rutas sur.jpg" class="card-img-top" alt="Rutas de la Zona Sur y Mallasa" width="200" height="200">
+        <div class="card-body">
+          <h5 class="card-title">Descubre la Zona Sur y Mallasa</h5>
+          <p class="card-text">
+            <ul>
+              <li>Recorridos guiados por expertos locales que te mostrarán lo mejor de la zona sur de La Paz.</li>
+              <li>Explora las verdes y tranquilas rutas de Mallasa, con su naturaleza única y paisajes impresionantes.</li>
+              <li>Visita atracciones icónicas como el **Parque Nacional de Mallasa**, **Valle de las Ánimas** y **la Chacaltaya**.</li>
+              <li>Disfruta de una experiencia personalizada, adaptada a tus intereses y ritmo, en un entorno relajante.</li>
+              <li>Comodidad, seguridad y conocimiento profundo sobre la flora, fauna y la historia local de la zona sur.</li>
+            </ul>
+          </p>
+          <a href="{{ url_for('mapas.ver_zonas') }}"  class="btn btn-primary">Ver Mapa</a>
+        </div>
+      </div>
+      
+      <div class="card card text-bg-dark mb-3">
+        <img src="/static/images/Telefericos.jpg" class="card-img-top" alt="Recorrido por los Teleféricos de La Paz" width="200" height="200">
+        <div class="card-body">
+          <h5 class="card-title">Recorre La Paz desde los Teleféricos</h5>
+          <p class="card-text">
+            <ul>
+              <li>Disfruta de vistas panorámicas inigualables de La Paz y El Alto desde el sistema de teleféricos más alto del mundo.</li>
+              <li>Guías expertos te acompañarán en cada tramo, explicando la historia, cultura y paisajes de la ciudad.</li>
+              <li>Recorre las distintas rutas del teleférico, conectando puntos clave como el centro histórico, la zona sur, y El Alto.</li>
+              <li>Flexibilidad en el itinerario, permitiendo adaptaciones para que disfrutes más de cada recorrido según tu tiempo y preferencias.</li>
+              <li>Viaja de manera segura y cómoda, disfrutando de la modernidad y la belleza natural de La Paz desde las alturas.</li>
+            </ul>
+          </p>
+          <!-- Botón Ver Mapa -->
+    <a href="{{url_for('mapas.ver_telefericos')}}" class="btn btn-primary">Ver Mapa</a>
+        </div>
+      </div>
+      
+      <div class="card card text-bg-dark mb-3">
+        <img src="/static/images/Rutas el Alto.jpg" class="card-img-top" alt="Turismo en El Alto" width="200" height="200">
+        <div class="card-body">
+          <h5 class="card-title">Explora El Alto</h5>
+          <p class="card-text">
+            <ul>
+              <li>Vive la energía única de El Alto con nuestras rutas guiadas por sus calles vibrantes y auténticas.</li>
+              <li>Descubre miradores espectaculares como el **Mirador de la Ciudad** y el **Mirador de los Andes**, que ofrecen vistas impresionantes de La Paz y el altiplano.</li>
+              <li>Sumérgete en la cultura de El Alto visitando sus **mercados populares**, como el Mercado de las Pulgas y el Mercado 16 de Julio, famosos por su colorido y diversidad.</li>
+              <li>Recorre rutas que conectan El Alto con La Paz, disfrutando de la contrastante geografía y de la vida urbana entre ambas ciudades.</li>
+              <li>Experimenta la calidez de su gente, en un recorrido que te permitirá conocer las costumbres y tradiciones de este dinámico lugar.</li>
+            </ul>
+          </p>
+          <!-- Botón Ver Mapa -->
+    <a href="{{url_for('mapas.ver_alto')}}" class="btn btn-primary">Ver Mapa</a>
+        </div>
+      </div>
+      
+  </div>
+
+  <div class="mt-4">
+    <h3 class="mb-3">Nuestros Servicios</h3>
+    <ol class="list-group list-group-numbered">
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Recorridos Históricos</div>
+          Explora lugares emblemáticos de La Paz y su historia fascinante.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">1</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Experiencias Culturales</div>
+          Sumérgete en las tradiciones, arte y sabores locales.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">2</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Rutas Panorámicas</div>
+          Disfruta vistas impresionantes desde los puntos más altos de la ciudad.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">3</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Tours Personalizados</div>
+          Solicita tu conductor-guia experimentado segun tus gustos.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">4</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Eventos Especiales</div>
+          Organizamos recorridos para eventos y grupos.
+        </div>
+        <span class="badge text-bg-primary rounded-pill">5</span>
+      </li>
+    </ol>
+  </div>
+</div>
+
+</body>
+</html>
+
+{% include 'footer.html' %}

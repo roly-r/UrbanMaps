@@ -1,0 +1,675 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rutas de Interes - El Alto</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/2.9.9/leaflet-search.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-measure/3.0.0/leaflet-measure.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.72.0/L.Control.Locate.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-easybutton/2.4.0/easy-button.min.css">
+
+  <style>
+    #map {
+      width: 100%;
+      height: 90vh;
+    }
+    .info {
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+    /* Estilo para las imágenes dentro de los popups */
+    .popup-img {
+      width: 300px; /* Ajuste el tamaño de la imagen */
+      height: auto; /* Mantener la proporción de la imagen */
+      margin-bottom: 10px;
+    }
+  
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        header {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+        }
+
+        .leaflet-popup-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .leaflet-popup-content {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .leaflet-control-layers {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+        }
+    
+  </style>
+
+
+</head>
+<body>
+  <h1>Recorridos de Interes - El Alto</h1>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/2.9.9/leaflet-search.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-measure/3.0.0/leaflet-measure.min.js"></script>
+  <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.72.0/L.Control.Locate.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-easybutton/2.4.0/easy-button.min.js"></script>
+  <script>
+    // Inicializar el mapa
+    const map = L.map('map').setView([-16.5105, -68.1625], 13); // Coordenadas de El Alto
+
+    // Capa base (OpenStreetMap)
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Contenedor para las capas de rutas
+    const rutasLayers = {
+      "Rutas movilidad laguna": L.layerGroup(),
+      "Recorrido Laguna": L.layerGroup(),
+      "Recorrido tiahuanaco": L.layerGroup(),
+      "Rutas movilidad 16 de Julio": L.layerGroup(),
+      "Recorrido 16 de Julio":L.layerGroup(),
+      "Ruta movilidad prado alteño":L.layerGroup(),
+      "Ruta estadium":L.layerGroup(),
+      "Ruta Ciudad Satelite":L.layerGroup(),
+      "Ruta Mirador Virgen Blanca":L.layerGroup(),
+      "Ruta Mirador Atiripi":L.layerGroup()
+    };
+
+    // Datos GeoJSON de rutas
+    const rutasData = {
+      "type": "FeatureCollection",
+      "features": [
+        // Rutas en movilidad laguna
+        {
+          "type": "Feature",
+          "properties": { "name": "Carretera Laguna Achocalla", "descripcion": "Cruze achocalla por carretera de achocalla-mallasa Centro natural turistico", "tipo": "movilidad" ,"imagen":"static/img/ruta-achocalla.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+            [-68.16735,-16.58035],
+            [-68.16816,-16.57946],
+            [-68.16924,-16.57607],
+            [-68.17028,-16.57443],
+            [-68.17329,-16.57201],
+            [-68.17485,-16.57137],
+            [-68.17660,-16.57219],
+            [-68.17760,-16.57226],
+            [-68.17775,-16.57191],
+            [-68.17652,-16.57080],
+            [-68.17444,-16.56977],
+            [-68.17266,-16.56835],
+            [-68.17192,-16.56681],
+            [-68.17284,-16.56585],
+            [-68.17392,-16.56528],
+            [-68.17396,-16.56393],
+            [-68.17723,-16.56350],
+            [-68.17816,-16.56151],
+            [-68.17693,-16.55962],
+            [-68.17485,-16.55716],
+            [-68.17556,-16.55706],
+            [-68.17708,-16.55873],
+            [-68.17727,-16.55837],
+            [-68.17585,-16.55624],
+            [-68.17485,-16.55542],
+            [-68.17626,-16.55567],
+            [-68.17924,-16.55474]
+              
+            ]
+          }
+        },
+        //recorrido a pie lahuna
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido Laguna Achocalla", "descripcion": "centro turistico lleno de actividades como :paseo en bote,comidas,paseo a caballo,paseo en vehiculo,caminata y parillas", "tipo": "rec laguna" ,"imagen":"static/img/laguna.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.16770,-16.57962],
+              [-68.16738,-16.57849],
+              [-68.16751,-16.57826],
+              [-68.16750,-16.57741],
+              [-68.16729,-16.57655],
+              [-68.16709,-16.57625],
+              [-68.16692,-16.57586],
+              [-68.16610,-16.57492],
+              [-68.16614,-16.57445],
+              [-68.16566,-16.57422],
+              [-68.16434,-16.57458],
+              [-68.16332,-16.57630],
+              [-68.16255,-16.57727],
+              [-68.16205,-16.57751],
+              [-68.16137,-16.57744],
+              [-68.16164,-16.57807],
+              [-68.16259,-16.57792],
+              [-68.16304,-16.57791],
+              [-68.16326,-16.57652],
+              [-68.16350,-16.57607],
+              [-68.16456,-16.57670],
+              [-68.16430,-16.57716],
+              [-68.16428,-16.57757],
+              [-68.16389,-16.57796],
+              [-68.16395,-16.57830],
+              [-68.16354,-16.57853],
+              [-68.16369,-16.57876],
+              [-68.16354,-16.57899],
+              [-68.16332,-16.57881],
+              [-68.16315,-16.57919],
+              [-68.16330,-16.57951],
+              [-68.16380,-16.57990],
+              [-68.16408,-16.58029],
+              [-68.16437,-16.57994],
+              [-68.16463,-16.57970],
+              [-68.16469,-16.57944],
+              [-68.16501,-16.57931],
+              [-68.16515,-16.57992],
+              [-68.16658,-16.58022],
+              [-68.16707,-16.58052]
+              
+            ]
+          }
+        },
+        //rutas movilidad 16
+        {
+          "type": "Feature",
+          "properties": { "name": "Rutas 16 de julio", "descripcion": "Por la av Juan Pablo II - Av.Panoramica - Av.16 de Julio - Av.Alfonzo Ugarte - Av.Plaza La Paz", "tipo": "movilidad 16","imagen":"static/img/rutas-16.jpeg" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17217,-16.48986],
+              [-68.17334,-16.49424],
+              [-68.17423,-16.49457],
+              [-68.18254,-16.49240],
+              [-68.18321,-16.49285],
+              [-68.18453,-16.49730],
+              [-68.17498,-16.49981],
+              [-68.17361,-16.49547],
+              [-68.17295,-16.49495],
+              [-68.16788,-16.49629],
+              [-68.16721,-16.49603],
+              [-68.16300,-16.50168]
+              
+              
+            ]
+          }
+        },
+        // Rutas a pie 16
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido por la av.Panoramica", "descripcion": "Partiendo del teleferico rojo por la av.Panoramica ,se encuentran productos como: ropa, herraminetas ,repuestos ,comida ,ornamentaria ,joyeria ,maquillaje , etc", "tipo": "16" ,"imagen": "static/img/recorrido panoramica.jpg" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.16346,-16.50092],
+              [-68.16714,-16.49589],
+              [-68.17050,-16.49183],
+              [-68.17124,-16.49074],
+              [-68.17164,-16.48864]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido av.16 de Julio", "descripcion": "Venta de movilidades, repuestos, herramientas ,calzados , ropa, instrumentos ,luminarias , equipo de gimnacio, etc", "tipo": "16" , "imagen":"static/img/av.16 de julio.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.16786,-16.49625],
+              [-68.17305,-16.49493],
+              [-68.17309,-16.49459],
+              [-68.17335,-16.49434],
+              [-68.17394,-16.49459],
+              [-68.18263,-16.49240]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido Av.Alfonzo Ugarte", "descripcion": "Desde el teleferico azul por av.ugarte venta de : ropas, calzados ,comida , electrodomecticos, instrumentos y herramientas", "tipo": "16" ,"imagen":"static/img/av izquierda.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17335,-16.49434],
+              [-68.17169,-16.48860]
+              
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido Av.Alfonzo Ugarte", "descripcion": "Desde teleferico hacia el lado derecho venta de:ropas ,calzados ,comida ,electrodomesticos, materiales , etc", "tipo": "16" ,"imagen":"static/img/alfonso-ugarte.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17364,-16.49532],
+              [-68.17487,-16.49949]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido calle luis torrez", "descripcion": "desde la plaza del maestro por la calle luis torrez", "tipo": "16" ,"imagen":"static/img/luiz torrez.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.16781,-16.49651],
+              [-68.16918,-16.49714],
+              [-68.17471,-16.49962]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido Jose Arzabe", "descripcion": "Paralela a la av.16 de julio", "tipo": "16" ,"imagen":"static/img/jose arzabe.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.16918,-16.49714],
+              [-68.17769,-16.49483]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido C.Alfredo Pazcoe", "descripcion": "Paralela a c.Jose Arzabe caracteristica:venta de mascotas", "tipo": "16", "imagen":"static/img/Alfredo Pazcoe.jpg" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17804,-16.49577],
+              [-68.17055,-16.49779]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido C.Rene Dorado", "descripcion": "Desde la plaza del maestro caracteristica:venta de repuestos", "tipo": "16" ,"imagen":"static/img/Calle Rene Dorado.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.16723,-16.49652],
+              [-68.16528,-16.49977]
+            ]
+          }
+        }, 
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido Av.Rene Vargas", "descripcion": "Paralela a c.Luis de la vega caracteristica:venta de fereterria", "tipo": "16" ,"imagen":"static/img/C.Rene V.png"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17841,-16.49033],
+              [-68.17285,-16.49182]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido C.Luis de la Vega", "descripcion": "paralela a c.Eliodoro Nely caracteristica:Intrumentos y objetos culturales", "tipo": "16","imagen":"static/img/luis de la vega.jpg" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17866,-16.49128],
+              [-68.16909,-16.49384]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido C.Eliodoro Nery", "descripcion": "Paraleloa a av.16 de Julio caracteristica:componentes electricos y electrodomesticos", "tipo": "16","imagen":"static/img/C eliodoro nery.jpg" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17897,-16.49224],
+              [-68.16815,-16.49513]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido C.Fournier", "descripcion": "En medio de estaciones plaza la paz y plaza libertad caracteristica: condimentos, carnicerias e ingredientes", "tipo": "16" ,"imagen":"static/img/C Fournier.avif"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17689,-16.49916],
+              [-68.17439,-16.49038]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido C.Nisthaus", "descripcion": "Cercana a plaza la paz caracteristica: Muebles, carnicerias", "tipo": "16","imagen":"static/img/C.nisthaus.jpg" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17624,-16.48986],
+              [-68.17876,-16.49863]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Recorrido feria tiahuanaco", "descripcion": "feria de la avenida tiahuanaco con actividades principlamente de compra y venta de varios productos (electrodomesticos ,ropa ,comida ,herramientas ,etc)", "tipo": "tiahuanaco" ,"imagen":"static/img/tiahuanaco.webp"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.16867,-16.52256],
+              [-68.16711,-16.52128],
+              [-68.16396,-16.51768],
+              [-68.16277,-16.51630],
+              [-68.16124,-16.51423],
+              [-68.16091,-16.51280],
+              [-68.16117,-16.51145],
+              [-68.16173,-16.51013],
+              [-68.16176,-16.50946],
+              [-68.16136,-16.50803],
+              [-68.16065,-16.50696],
+              [-68.16102,-16.50493]
+            ]
+          }
+        },
+        // Rutas prado alteño
+        {
+          "type": "Feature",
+          "properties": { "name": "Ruta Av Civica", "descripcion": "Prado alteño a obelisco caminatas y ferias cientificas", "tipo": "prado","imagen":"static/img/Prado alteño.jpg" },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.16836,-16.54164],
+              [-68.16097,-16.52981],
+              [-68.16068,-16.52919],
+              [-68.15730,-16.52123],
+              [-68.15523,-16.51619],
+              [-68.15510,-16.51593],
+              [-68.15374,-16.51243]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Ruta Av Antofagasta", "descripcion": "Obelisco - Av.Antofagasta patio de comidas y camino al teleferico amariloo", "tipo": "prado" ,"imagen":"static/img/antofagasta teleferico.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.15510,-16.51593],
+              [-68.15084,-16.51763],
+              [-68.15019,-16.51843]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": { "name": "Camino al estadium de El Alto", "descripcion": "Del teleferico rio seco-Luiz espinazo-Mariscal Santa cruz-calle tacanan", "tipo": "estadium" ,"imagen":"static/img/Estadio-Municipal.webp"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.20279,-16.47170],
+              [-68.20578,-16.47722],
+              [-68.20320,-16.47864],
+              [-68.20123,-16.48228],
+              [-68.20662,-16.48591],
+              [-68.20662,-16.48591],
+              [-68.20940,-16.48961]
+            ]
+          }
+        },
+        //mirador virgen blanca
+        {
+          "type": "Feature",
+          "properties": { "name": "Ruta Mirador Virgen Blanca", "descripcion": "Del teleferico amarillo por la avenida panoramica", "tipo": "mirador1" ,"imagen":"static/img/Mirador Virgen Blanca.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.15019,-16.51853],
+              [-68.14984,-16.52019],
+              [-68.14902,-16.52134],
+              [-68.14846,-16.52188],
+              [-68.14787,-16.52508],
+              [-68.14705,-16.52544],
+              [-68.14525,-16.52833],
+              [-68.14570,-16.52900],
+              [-68.14659,-16.52973]
+            ]
+          }
+        },
+        //mirador parque atiripi
+        {
+          "type": "Feature",
+          "properties": { "name": "Ruta al mirado atiripi", "descripcion": "Desde la carretera achocalla-mallasa, vistas panoramicas ", "tipo": "mirador2" ,"imagen":"static/img/Parque Mirador Atipiri.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.17990,-16.55491],
+              [-68.18406,-16.56538],
+              [-68.18588,-16.57001],
+              [-68.18588,-16.57104],
+              [-68.18495,-16.58172],
+              [-68.18258,-16.58400],
+              [-68.17912,-16.58557],
+              [-68.17527,-16.58207]
+            ]
+          }
+        },
+        //ruta ciudad satelite
+        {
+          "type": "Feature",
+          "properties": { "name": "Ruta Ciudad Satelite", "descripcion": "Desde el prado alteño, actividades como: shoping , patio de comidas, atracciones , museos y supermercados", "tipo": "satelite" ,"imagen":"static/img/satelite.jpg"},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [-68.15732,-16.52142],
+              [-68.15332,-16.52298],
+              [-68.15130,-16.52380],
+              [-68.15088,-16.52378],
+              [-68.14713,-16.52539],
+              [-68.14525,-16.52828],
+              [-68.14563,-16.52889],
+              [-68.15104,-16.52676],
+              [-68.15830,-16.52381]
+            ]
+          }
+        }
+      ]
+    };
+
+    // Crear capas de rutas con diferentes estilos
+    rutasData.features.forEach((feature) => {
+      const { tipo } = feature.properties;
+      const layer = L.geoJSON(feature, {
+        style: {
+          color: tipo === "movilidad" ? "blue" :
+                 tipo === "16" ? "green" :
+                 tipo === "mirador2" ? "green" :
+                 tipo === "mirado1" ? "aquamarine" :
+                 tipo === "satelite" ? "orange" :
+                 tipo === "tiahuanaco" ? "black" :
+                 tipo === "estadium" ? "brown" :
+                 tipo === "rec laguna" ? "blue" :
+                 tipo === "movilidad 16" ? "lime" :
+                 tipo === "prado" ? "purple" :
+                 tipo === "pie" ? "green" : "gray", // Color por defecto: gris
+          dashArray: (tipo === "pie" || tipo === "16" ||tipo==="tiahuanaco" ||tipo==="rec laguna" ) ? "5, 5" : null // Líneas punteadas para los tipos seleccionados
+        }
+      }).bindPopup(function() {
+        // Aquí agregamos la imagen si existe en las propiedades
+        const img = feature.properties.imagen ? `<img src="${feature.properties.imagen}" alt="${feature.properties.name}" class="popup-img">` : '';
+        return `<strong>${feature.properties.name}</strong><br>
+                ${feature.properties.descripcion}<br>${img}`;
+      });
+
+      // Agregar la capa al grupo correspondiente
+      if (tipo === "movilidad") {
+        rutasLayers["Rutas movilidad laguna"].addLayer(layer);
+      } else if (tipo === "pie") {
+        rutasLayers["Rutas a pie"].addLayer(layer);
+      } else if (tipo === "16") {
+        rutasLayers["Recorrido 16 de Julio"].addLayer(layer);
+      } else if (tipo === "movilidad 16") {
+        rutasLayers["Rutas movilidad 16 de Julio"].addLayer(layer);
+      }else if (tipo === "prado") {
+        rutasLayers["Ruta movilidad prado alteño"].addLayer(layer);
+      }else if (tipo === "tiahuanaco") {
+        rutasLayers["Recorrido tiahuanaco"].addLayer(layer);
+      }else if (tipo === "rec laguna") {
+        rutasLayers["Recorrido Laguna"].addLayer(layer);
+      }else if (tipo === "estadium") {
+        rutasLayers["Ruta estadium"].addLayer(layer);
+      }else if (tipo === "satelite") {
+        rutasLayers["Ruta Ciudad Satelite"].addLayer(layer);
+      }else if (tipo === "mirador1") {
+        rutasLayers["Ruta Mirador Virgen Blanca"].addLayer(layer);
+      }else if (tipo === "mirador2") {
+        rutasLayers["Ruta Mirador Atiripi"].addLayer(layer);
+      }
+
+      
+    });
+
+    // Añadir capas de grupo al control de capas
+    const layerControl = L.control.layers(null, rutasLayers).addTo(map);
+
+    // Añadir todas las capas de rutas al mapa por defecto
+    Object.values(rutasLayers).forEach(group => group.addTo(map));
+
+    // Control para mostrar información adicional
+    const info = L.control();
+    info.onAdd = function () {
+      this._div = L.DomUtil.create('div', 'info');
+      this.update();
+      return this._div;
+    };
+
+    info.update = function (props) {
+      this._div.innerHTML = props
+        ? `<h4>Información</h4><b>${props.name}</b><br>${props.descripcion}`
+        : `<h4>Haz clic en una ruta para más detalles</h4>`;
+    };
+    info.addTo(map);
+
+    // Actualizar información al pasar el mouse sobre una ruta
+    Object.values(rutasLayers).forEach(group => {
+      group.eachLayer(layer => {
+        layer.on('mouseover', (e) => {
+          info.update(e.layer.feature.properties);
+        });
+        layer.on('mouseout', () => info.update());
+      });
+    });
+
+    // Hacer zoom cuando se selecciona una capa
+    map.on('layeradd', function(event) {
+      if (event.layer instanceof L.GeoJSON) {
+        map.fitBounds(event.layer.getBounds()); // Zoom a la capa seleccionada
+      }
+    });
+
+    // Agregar control de búsqueda
+    const searchControl = new L.Control.Search({
+      layer: L.layerGroup(Object.values(rutasLayers).flatMap(group => group.getLayers())),
+      propertyName: 'name',
+      zoom: 15,
+      initial: false
+    });
+    map.addControl(searchControl);
+
+
+    // Botón de geolocalización
+    L.control.locate({
+      position: 'topleft',
+      strings: {
+        title: "Mostrar mi ubicación"
+      },
+      keepCurrentZoomLevel: true
+    }).addTo(map);
+
+// Crear un grupo para almacenar las capas dibujadas
+const drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+// Agregar control de dibujo con opciones de edición y eliminación
+const drawControl = new L.Control.Draw({
+  draw: {
+    polyline: true,   // Permitir dibujar líneas
+    polygon: true,    // Permitir dibujar polígonos
+    rectangle: true,  // Permitir dibujar rectángulos
+    circle: false,    // Deshabilitar círculos
+    marker: true      // Permitir agregar marcadores
+  },
+  edit: {
+    featureGroup: drawnItems, // Permitir editar y eliminar las capas del grupo
+    remove: true              // Habilitar la opción de eliminar capas
+  }
+});
+map.addControl(drawControl);
+
+// Evento al finalizar el dibujo
+map.on(L.Draw.Event.CREATED, function(e) {
+  const layer = e.layer;
+  drawnItems.addLayer(layer); // Agregar la nueva forma al grupo
+});
+
+// Eventos adicionales para gestionar edición/eliminación
+map.on('draw:edited', function(e) {
+  const layers = e.layers;
+  layers.eachLayer(function(layer) {
+    console.log('Capa editada:', layer);
+    // Aquí puedes agregar acciones adicionales al editar una capa
+  });
+});
+
+map.on('draw:deleted', function(e) {
+  const layers = e.layers;
+  layers.eachLayer(function(layer) {
+    console.log('Capa eliminada:', layer);
+    // Aquí puedes agregar acciones adicionales al eliminar una capa
+  });
+});
+
+
+// Coordenadas iniciales y nivel de zoom
+const initialView = [-16.5105, -68.1625];
+const initialZoom = 13;
+
+// Crear el botón de volver al inicio
+L.easyButton('fa-home', function() {
+  map.setView(initialView, initialZoom);
+}, 'Volver al inicio').addTo(map);
+
+
+    
+  </script>
+
+</body>
+</html>

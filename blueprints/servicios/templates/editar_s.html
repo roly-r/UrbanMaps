@@ -1,0 +1,32 @@
+{% include 'header.html' %}
+<br><br>
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="fw-bold">EDITAR DATOS SERVICIO</h2>
+<form action="{{ url_for('servicios.editar_s', id=servicio['id']) }}" method="POST">
+    <div class="mb-3">
+        <label for="id_vehiculo" class="form-label">Placa Vehículo</label>
+        <select name="id_vehiculo" class="form-control" required>
+            <option value="">Seleccionar automóvil</option>
+            {% for vehiculo in vehiculos %}
+            <option value="{{ vehiculo['id'] }}" {% if vehiculo['id'] == servicio['id_vehiculo'] %}selected{% endif %}>
+                {{ vehiculo['placa'] }} - {{ vehiculo['marca'] }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="fecha_pago_servicio">Fecha</label>
+        <input type="date" class="form-control" name="fecha_pago_servicio" value="{{ servicio['fecha_pago_servicio'] }}" required>
+    </div>
+    <div class="mb-3">    
+        <label for="monto">Monto</label>
+        <input type="number" step="0.01" class="form-control" name="monto" value="{{ servicio['monto'] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="descripcion">Descripción</label>
+        <input type="text" class="form-control" name="descripcion" value="{{ servicio['descripcion'] }}" required>
+    </div>
+    <br>
+    <button type="submit" class="btn btn-outline-light">ACTUALIZAR SERVICIO</button>
+</form>
+{% include 'footer.html' %}

@@ -1,0 +1,67 @@
+{% include 'header.html' %}
+<br><br>
+
+<div class="container mt-4">
+  <h1 class="fw-bold">LISTA DE GUIAS</h1>
+
+<br>
+
+<form action="{{ url_for('guias.buscar_afi') }}" method="POST" class="mb-4">
+  <br>
+  <div class="row g-2 align-items-center">
+      <div class="search-container">
+          
+          <input type="text" name="termino" id="termino" class="form-control" 
+                 value="{{ termino | default('') }}" placeholder="Ingrese CI:" required>
+
+          <button type="submit" class="btn btn-outline-info">Buscar</button>
+      </div>
+  </div>
+</form>
+
+<table class="tabla-gris">
+    <thead>
+      <tr>
+        <th scope="col">CI</th>
+        <th scope="col">NOMBRES</th>
+        <th scope="col">APELLIDOS</th>
+        <th scope="col">DIRECCION</th>
+        <th scope="col">FECHA NACIMIENTO</th>
+        <th scope="col">TELEFONO</th>
+        <th scope="col">FECHA INCORPORACION</th>
+        <th scope="col">NRO LICENCIA</th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        {% for item in afiliados %}
+      <tr>
+        <th scope="row">{{item['ci']}}</th>
+        <td>{{item['nombres']}}</td>
+        <td>{{item['apellidos']}}</td>
+        <td>{{item['direccion']}}</td>
+        <td>{{item['fecha_nacimiento']}}</td>
+        <td>{{item['telefono']}}</td>
+        <td>{{item['fecha_incorporacion']}}</td>
+        <td>{{item['nro_licencia']}}</td>
+        
+        <td>
+          <a href="/edit/{{item.ci}}" class="btn btn-outline-info">EDITAR</a>
+        </td>
+        <td>
+          <a href="/borrar/{{item.ci}}" onclick="return(confirm('Esta seguro?'))" class="btn btn-outline-danger">ELIMINAR</a>
+        </td>
+        <td>
+          <a href="{{url_for('guias.detalle_afiliado', ci=item.ci)}}" class="btn btn-outline-secondary">DETALLES</a>
+        </td>
+  
+      </tr>
+        {% endfor %} 
+    </tbody>
+  </table>
+  <div >
+    <a href="{{url_for('guias.afiliado_crear')}}" class="btn btn-outline-light" >NUEVO</a>
+  </div>
+{% include 'footer.html' %}

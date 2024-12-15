@@ -1,0 +1,46 @@
+{% include 'header.html' %}
+<br><br>
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="fw-bold">DATOS DEL USUARIO</h2>
+<form action="{{url_for('usuarios.crear_user')}}" method="POST">
+    <div class="mb-3">
+        <label for="nombre">Nombre</label>
+        <input type="text" class="form-control" name="nombre" required>
+    </div>
+    <div class="mb-3">
+        <label for="apellido">Apellido</label>
+        <input type="text" class="form-control" name="apellido" required>
+    </div>
+    <div class="mb-3">
+        <label for="ci">Celula de identidad</label>
+        <input type="text" class="form-control" name="ci" required>
+    </div>
+    <div class="mb-3">
+        <label for="tipo">Tipo de cargo</label>
+        <select class="form-control" name="tipo" id="tipo" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Operador">Operador</option>
+        </select>
+    </div>
+    
+    <div class="mb-3">
+        <label for="fecha_nan">Fecha de nacimiento</label>
+        <input type="date" class="form-control" name="fecha_nan" required>
+    </div>
+    <div class="mb-3">
+        <label for="fecha_inc">Fecha de incroporacion</label>
+        <input type="date" class="form-control" name="fecha_inc" required>
+    </div>
+    <div class="mb-3">
+        <label for="username">USERNAME</label>
+        <input type="text" class="form-control" name="username" required>
+    </div>
+    <div class="mb-3">
+        <label for="password">PASSSWORD</label>
+        <input type="password" class="form-control" name="password" required>
+    </div>
+    <button type="submit" class="btn btn-outline-light">CREAR USUARIO</button>
+</form>
+
+{% include 'footer.html' %}
