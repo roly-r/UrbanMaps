@@ -497,6 +497,14 @@
             layer.on('mouseover', (e) => info.update(e.layer.feature.properties));
             layer.on('mouseout', () => info.update());
         });
+
+// Hacer zoom cuando se selecciona una capa
+map.on('layeradd', function(event) {
+      if (event.layer instanceof L.GeoJSON) {
+        map.fitBounds(event.layer.getBounds()); // Zoom a la capa seleccionada
+      }
+    });
+
     </script>
 </body>
 
